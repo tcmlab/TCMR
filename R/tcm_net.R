@@ -14,18 +14,34 @@
 #' @param edge.color edge color
 #' @param edge.width edge width
 #' @param graph.layout etwork Diagram Layout:
-#' "kk", nicely", "grid","sphere", "randomly",
-#' "bipartite", "star","tree", nicely", "grid",
-#' "sphere", "randomly","gem", "graphopt","lgl",
-#' "mds", "sugiyama"
+#' @param graph.layout Network Diagram Layout:
+#' "kk", "nicely", "circle", "sphere",
+#' "bipartite", "star", "tree", "randomly",
+#' "gem", "graphopt","lgl", "grid",
+#' "mds", "sugiyama","fr"
 #' @param rem.dis.inter remove single free unconnected nodes
 #' @param label.repel label repel
 #'
 #' @return Network Diagram
 #' @export
-#' @import dplyr
-#' @import ggplot2
-#' @import ggraph
+#' @importFrom ggplot2 scale_color_gradientn
+#' @importFrom ggplot2 scale_size_continuous
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 scale_fill_manual
+#' @importFrom ggplot2 aes
+#' @importFrom dplyr filter
+#' @importFrom dplyr distinct
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
+#' @importFrom dplyr rename
+#' @importFrom dplyr count
+#' @importFrom ggraph ggraph
+#' @importFrom ggraph geom_edge_fan
+#' @importFrom ggraph geom_node_point
+#' @importFrom ggraph geom_node_text
+#' @importFrom ggraph scale_edge_width
+#' @importFrom ggraph geom_edge_link0
+#' @importFrom ggraph theme_graph
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom igraph V
@@ -38,7 +54,9 @@
 #'   dplyr::select(herb, molecule, target) %>%
 #'   sample_n(100, replace = FALSE) %>%
 #'   as.data.frame()
-#' tcm_net(network.data, rem.dis.inter = TRUE)
+#' tcm_net(network.data, node.color= "Spectral",
+#' label.degree = 1, rem.dis.inter = TRUE,graph.layout = "fr",
+#' label.size = 3)
 #' }
 tcm_net <- function(network.data,
                     node.color = "RdBu",
@@ -62,12 +80,12 @@ tcm_net <- function(network.data,
   ) %>%
     dplyr::distinct()
   # Create a network graph from links and nodes
-  if (rem.dis.inter == FALSE && label.repel == TRUE) {
+  if (rem.dis.inter == FALSE) {
     nodes <- links %>%
       {
         data.frame(node = c(.$from, .$to))
       } %>%
-      distinct()
+      dplyr::distinct()
     net <- igraph::graph_from_data_frame(
       d = links,
       vertices = nodes,
@@ -112,22 +130,24 @@ tcm_net <- function(network.data,
         shape = class
       ), alpha = 1.0) +
       scale_color_gradientn(colours = rev(colorN)) +
-      geom_node_text(aes(filter = degree >= label.degree,
-                         label = name), size = label.size, repel = TRUE) +
+      geom_node_text(aes(
+        filter = degree >= label.degree,
+        label = name
+      ), size = label.size, repel = label.repel) +
       scale_edge_width(range = edge.width) +
       scale_size_continuous(name = "degree", range = node.size) +
-      theme_graph(base_family = "sans")
-  } else if (rem.dis.inter == TRUE && label.repel == TRUE) {
+      ggraph::theme_graph(base_family = "sans")
+  } else if (rem.dis.inter == TRUE) {
     links <- links %>%
-      mutate(from_c = count(., from)$n[match(from, count(., from)$from)]) %>%
-      mutate(to_c = count(., to)$n[match(to, count(., to)$to)]) %>%
+      dplyr::mutate(from_c = count(., from)$n[match(from, count(., from)$from)]) %>%
+      dplyr::mutate(to_c = count(., to)$n[match(to, count(., to)$to)]) %>%
       filter(!(from_c == 1 & to_c == 1)) %>%
       dplyr::select(1, 2, 3)
     nodes <- links %>%
       {
         data.frame(node = c(.$from, .$to))
       } %>%
-      distinct()
+      dplyr::distinct()
     col <- RColorBrewer::brewer.pal(8, name = node.color)
     colorN <- grDevices::colorRampPalette(colors = col)(nrow(nodes))
     names(colorN) <- nodes$node
@@ -178,137 +198,13 @@ tcm_net <- function(network.data,
           label = name
         ),
         size = label.size,
-        repel = TRUE
+        repel = label.repel
       ) +
       scale_edge_width(range = edge.width) +
       scale_size_continuous(
         name = "degree",
         range = node.size
       ) +
-      theme_graph(base_family = "sans")
-  } else if (rem.dis.inter == FALSE && label.repel == FALSE) {
-    nodes <- links %>%
-      {
-        data.frame(node = c(.$from, .$to))
-      } %>%
-      distinct()
-    net <- igraph::graph_from_data_frame(
-      d = links,
-      vertices = nodes, directed = FALSE
-    )
-    # V and E are functions of the igraph package,
-    # which are used to modify the nodes (nodes) and
-    # connections (links) of the network graph respectively.
-    igraph::V(net)$degree <- igraph::degree(net)
-    igraph::V(net)$degree <- igraph::degree(net)
-    igraph::V(net)$class <- c(
-      rep(
-        colnames(network.data)[1],
-        length(intersect(network.data[, 1], nodes$node))
-      ),
-      rep(
-        colnames(network.data)[2],
-        length(intersect(network.data[, 2], nodes$node))
-      ),
-      rep(
-        colnames(network.data)[3],
-        length(intersect(network.data[, 3], nodes$node))
-      )
-    )
-    igraph::V(net)$size <- igraph::degree(net)
-    igraph::E(net)$score <- igraph::E(net)$weight
-    # Plot with ggraph
-    # ggraph is a package based on ggplot2,
-    # the syntax is similar to regular ggplot2
-    col <- RColorBrewer::brewer.pal(8, name = node.color)
-    colorN <- grDevices::colorRampPalette(colors = col)(nrow(nodes))
-    names(colorN) <- nodes$node
-
-    ggraph(net, layout = graph.layout) +
-      geom_edge_link0(aes(edge_linewidth = weight),
-        edge_colour = edge.color
-      ) +
-      geom_edge_fan(aes(edge_width = score, colour = score),
-        color = edge.color, show.legend = TRUE
-      ) +
-      ggraph::geom_node_point(aes(
-        color = degree, size = degree,
-        shape = class
-      ), alpha = 1.0) +
-      scale_color_gradientn(colours = rev(colorN)) +
-      geom_node_text(
-        aes(
-          filter = degree >= label.degree,
-          label = name
-        ),
-        size = label.size,
-        repel = FALSE
-      ) +
-      scale_edge_width(range = edge.width) +
-      scale_size_continuous(name = "degree", range = node.size) +
-      theme_graph(base_family = "sans")
-  } else if (rem.dis.inter == TRUE && label.repel == FALSE) {
-    links <- links %>%
-      mutate(from_c = count(., from)$n[match(from, count(., from)$from)]) %>%
-      mutate(to_c = count(., to)$n[match(to, count(., to)$to)]) %>%
-      filter(!(from_c == 1 & to_c == 1)) %>%
-      dplyr::select(1, 2, 3)
-    nodes <- links %>%
-      {
-        data.frame(node = c(.$from, .$to))
-      } %>%
-      distinct()
-    col <- RColorBrewer::brewer.pal(8, name = node.color)
-    colorN <- grDevices::colorRampPalette(colors = col)(nrow(nodes))
-    names(colorN) <- nodes$node
-
-    # Create a network graph from links and nodes
-    net <- igraph::graph_from_data_frame(
-      d = links,
-      vertices = nodes,
-      directed = FALSE
-    )
-    # # V and E are functions of the igraph package,
-    # which are used to modify the nodes (nodes) and
-    # connections (links) of the network graph respectively.
-    igraph::V(net)$degree <- igraph::degree(net) # 每个节点连接的节点数
-    igraph::V(net)$class <- c(
-      rep(
-        colnames(network.data)[1],
-        length(intersect(network.data[, 1], nodes$node))
-      ),
-      rep(
-        colnames(network.data)[2],
-        length(intersect(network.data[, 2], nodes$node))
-      ),
-      rep(
-        colnames(network.data)[3],
-        length(intersect(network.data[, 3], nodes$node))
-      )
-    )
-    igraph::V(net)$size <- igraph::degree(net)
-    igraph::E(net)$score <- igraph::E(net)$weight
-
-    # Plot with ggraph
-    p <- ggraph(net, layout = graph.layout) +
-      geom_edge_link0(aes(edge_linewidth = weight),
-        edge_colour = edge.color
-      ) +
-      geom_edge_fan(aes(edge_width = score, colour = score),
-        color = edge.color, show.legend = TRUE
-      ) +
-      ggraph::geom_node_point(aes(
-        color = degree,
-        size = degree,
-        shape = class
-      ), alpha = 1.0) +
-      scale_color_gradientn(colours = rev(colorN)) +
-      ggraph::geom_node_text(aes(filter = degree >= label.degree, label = name),
-        size = label.size, repel = FALSE
-      ) +
-      scale_edge_width(range = edge.width) +
-      scale_size_continuous(name = "degree", range = node.size) +
-      theme_graph(base_family = "sans")
-    return(p)
+      ggraph::theme_graph(base_family = "sans")
   }
 }

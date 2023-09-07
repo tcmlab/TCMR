@@ -17,7 +17,10 @@ pathway_cirplot(
 )
 }
 \arguments{
-\item{data}{data.frame}
+\item{data}{R clusterprofiler package for KEGG and GO results
+The data format must be S4 object with KEGG and GO results or
+a data frame with KEGG and GO results or
+a data frame with two columns.}
 
 \item{top}{According to the order of p adjust value from small to large
 the number of categories to show}

@@ -6,16 +6,17 @@
 \usage{
 cir_plot(
   data,
-  top = 20,
+  top = 15,
   id.color = "RdBu",
   id.cex = 0.8,
   gene.color = "#CFB0D4",
-  gene.cex = 1,
+  gene.cex = 0.8,
   ratio.color = c("#6291bd", "#B1D1E7"),
-  ratio.cex = 1,
+  ratio.cex = 0.8,
   p.color = c("#eda9aa", "#c25254"),
-  p.cex = 1,
+  p.cex = 0.8,
   richFactor.color = "RdBu",
+  richFactor.cex = 0.7,
   legend.position = c(0.8, 0.45),
   text.width = 35,
   ...
@@ -44,6 +45,8 @@ cir_plot(
 \item{p.cex}{The text size of padjust}
 
 \item{richFactor.color}{richFactor color}
+
+\item{richFactor.cex}{The text size of richFactor}
 
 \item{legend.position}{legend position}
 

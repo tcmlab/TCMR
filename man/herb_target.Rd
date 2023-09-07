@@ -32,6 +32,6 @@ Screen targets based on ingredients from Chinese herbal medicine
 }
 \examples{
 herbs <- c("ma huang", "ku xing ren")
-fufang <- herb_target(herbs, type ="Herb_name_pin_yin")
+fufang <- herb_target(herbs, type = "Herb_name_pin_yin")
 head(fufang)
 }

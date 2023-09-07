@@ -19,8 +19,24 @@
 #' @return figure
 #' @export
 #'
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 scale_color_gradientn
+#' @importFrom ggplot2 scale_size_continuous
+#' @importFrom ggplot2 scale_y_discrete
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 scale_colour_distiller
+#' @importFrom dplyr filter
+#' @importFrom dplyr distinct
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
+#' @importFrom dplyr arrange
+#' @importFrom tidyr drop_na
 #' @importFrom ggsankey make_long
 #' @importFrom ggsankey geom_sankey
 #' @importFrom ggsankey geom_sankey_text
@@ -35,7 +51,6 @@
 #' library(clusterProfiler)
 #' library(org.Hs.eg.db)
 #' library(DOSE)
-#' library(tidyverse)
 #' eg <- bitr(unique(xfbdf$target),
 #'   fromType = "SYMBOL",
 #'   toType = "ENTREZID",
@@ -47,15 +62,15 @@
 #'   pvalueCutoff = 0.05
 #' )
 #' KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID") %>%
-#'   mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio)))
+#'   dplyr::mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio)))
 #' path <- separate_rows(KK@result, geneID, sep = "/")
 #' data_sankey <- left_join(xfbdf, path,
 #'   by = c("target" = "geneID"),
 #'   relationship = "many-to-many"
 #' ) %>%
-#'   distinct() %>%
-#'   drop_na() %>%
-#'   sample_n(30, replace = FALSE) %>%
+#'   dplyr::distinct() %>%
+#'   tidyr::drop_na() %>%
+#'   dplyr::sample_n(30, replace = FALSE) %>%
 #'   as.data.frame()
 #' tcm_sankey_dot(data_sankey)
 #' }
@@ -75,12 +90,11 @@ tcm_sankey_dot <- function(data,
                            dot.height = 1.33,
                            ...) {
   # Data collation after KEGG or GO enrichment analysis
-
   data3 <- data %>%
     dplyr::select("ID", "Description", "p.adjust", "Count", "richFactor") %>%
-    distinct() %>%
-    arrange(p.adjust, descreasing = TRUE)
-  data3$richFactor <- data3$richFactor %>% round(., 2)
+    dplyr::distinct() %>%
+    dplyr::arrange(p.adjust, descreasing = TRUE)
+  data3$richFactor <- data3$richFactor %>% round(digits = 2)
 
   # bubble chart
   if (dot.lable == "Description") {
@@ -104,7 +118,7 @@ tcm_sankey_dot <- function(data,
           colour = "black", hjust = 1
         )
       ) +
-      scale_colour_distiller(palette = dot.color, direction = -1) + # 更改配色
+      scale_colour_distiller(palette = dot.color, direction = -1) +
       labs(x = "richFactor", y = "") +
       theme_bw() +
       theme(
@@ -136,7 +150,7 @@ tcm_sankey_dot <- function(data,
           colour = "black", hjust = 1
         )
       ) +
-      scale_colour_distiller(palette = dot.color, direction = -1) + # 更改配色
+      scale_colour_distiller(palette = dot.color, direction = -1) +
       labs(x = "richFactor", y = "") +
       theme_bw() +
       theme(
@@ -150,10 +164,10 @@ tcm_sankey_dot <- function(data,
   }
 
   data_sankey <- data %>%
-    arrange(richFactor, descreasing = FALSE) %>%
+    dplyr::arrange(richFactor, descreasing = FALSE) %>%
     dplyr::select(herb, molecule_id, target, dot.lable) %>%
     as.data.frame() %>%
-    distinct()
+    dplyr::distinct()
 
   df <- data_sankey %>% ggsankey::make_long(colnames(data_sankey))
 

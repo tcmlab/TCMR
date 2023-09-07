@@ -17,8 +17,21 @@
 #' @return barplot
 #' @export
 #'
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 scale_color_manual
+#' @importFrom ggplot2 scale_fill_manual
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_col
+#' @importFrom ggplot2 scale_fill_gradientn
+#' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 ylab
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 guide_colorbar
+#' @importFrom ggplot2 scale_y_discrete
+#' @importFrom dplyr mutate
+#' @importFrom dplyr slice
 #' @importFrom stats reorder
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom stringr str_wrap
@@ -26,6 +39,9 @@
 #' @examples
 #' \dontrun{
 #' data(xfbdf, package = "TCMR")
+#' library(clusterProfiler)
+#' library(org.Hs.eg.db)
+#' library(DOSE)
 #' eg <- bitr(unique(xfbdf$target),
 #'   fromType = "SYMBOL",
 #'   toType = "ENTREZID",
@@ -44,8 +60,9 @@
 #'   pvalueCutoff = 0.05,
 #'   readable = TRUE
 #' )
-#' bar_plot(KK,title = "KEGG")
-#' bar_plot(BP,title = "biological process")
+#' bar_plot(KK)
+#' bar_plot(KK@result[c( 11, 15, 17, 33, 41, 42, 47, 48,52, 53), ], title = "KEGG", color = "Spectral")
+#' bar_plot(BP@result[2:11,], title = "biological process", color = "Spectral")
 #' }
 bar_plot <- function(data,
                      top = 10,
@@ -55,20 +72,33 @@ bar_plot <- function(data,
                      text.bar = 4,
                      title = NULL, ...) {
   # data processing
-  data2 <- mutate(data,
-    richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio))
-  )
+  if (isS4(data)) {
+    data <- data@result %>% tidyr::drop_na()
+  } else if (is.data.frame(data)) {
+    data <- data %>% tidyr::drop_na()
+  } else {
+    print("The data format must be S4 object or data frame.")
+  }
+  # Rich Factor
+  data2 <- dplyr::mutate(data,
+    richFactor = Count / as.numeric(sub(
+      "/\\d+", "",
+      BgRatio
+    ))
+  ) %>%
+    dplyr::slice(1:top)
+    data2$richFactor <- data2$richFactor %>% round(digits = 2)
   # ggplot2 plotting
-  p <- ggplot(data2, showCategory = top) +
+  p <- ggplot(data2) +
     geom_col(aes(x = Count, y = reorder(Description, Count), fill = p.adjust),
       color = "black",
       width = 0.6
     ) +
     geom_text(aes(x = Count, y = reorder(Description, Count), label = Count),
-      hjust = -0.3,
+      hjust = -0.05,
       vjust = 0.5,
       size = text.bar
-    ) + # Count value
+    ) +
     scale_fill_gradientn(
       colours = RColorBrewer::brewer.pal(8, color),
       trans = "log10",

@@ -65,7 +65,6 @@ data(xfbdf, package = "TCMR")
 library(clusterProfiler)
 library(org.Hs.eg.db)
 library(DOSE)
-library(tidyverse)
 eg <- bitr(unique(xfbdf$target),
   fromType = "SYMBOL",
   toType = "ENTREZID",
@@ -77,15 +76,15 @@ KK <- enrichKEGG(
   pvalueCutoff = 0.05
 )
 KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID") \%>\%
-  mutate(richFactor = Count / as.numeric(sub("/\\\\d+", "", BgRatio)))
+  dplyr::mutate(richFactor = Count / as.numeric(sub("/\\\\d+", "", BgRatio)))
 path <- separate_rows(KK@result, geneID, sep = "/")
 data_sankey <- left_join(xfbdf, path,
   by = c("target" = "geneID"),
   relationship = "many-to-many"
 ) \%>\%
-  distinct() \%>\%
-  drop_na() \%>\%
-  sample_n(30, replace = FALSE) \%>\%
+  dplyr::distinct() \%>\%
+  tidyr::drop_na() \%>\%
+  dplyr::sample_n(30, replace = FALSE) \%>\%
   as.data.frame()
 tcm_sankey_dot(data_sankey)
 }

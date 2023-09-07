@@ -11,8 +11,21 @@
 #'
 #' @return figure
 #' @export
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 scale_fill_gradient2
+#' @importFrom ggplot2 scale_colour_gradient2
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 geom_text
+#' @importFrom ggplot2 geom_tile
+#' @importFrom ggplot2 element_blank
+#' @importFrom ggplot2 guides
+#' @importFrom ggplot2 guide_colorbar
+#' @importFrom ggplot2 scale_y_discrete
+#' @importFrom ggplot2 unit
+#' @importFrom dplyr mutate
 #' @importFrom tidyr pivot_longer
 #' @importFrom stats hclust
 #' @importFrom stats dist
@@ -26,7 +39,7 @@
 #' data[1:9, seq(1, 9, 2)] <- data[1:9, seq(1, 9, 2)] - 4
 #' colnames(data) <- paste("molecule", 1:9, sep = "")
 #' rownames(data) <- paste("target", 1:9, sep = "")
-#' data <- round(data, 2)
+#' data <- round(data, digits = 2)
 #' dock_plot(data)
 #' dock_plot(data, shape = "circle", legend.height = 3)
 dock_plot <- function(data,

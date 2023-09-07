@@ -8,7 +8,7 @@ pathway_ccplot(
   data,
   top = 5,
   label.name = "Description",
-  root = "KEGG",
+  root = NULL,
   color.node = "Paired",
   color.alpha = 0.5,
   text.size = c(3, 4),
@@ -16,7 +16,10 @@ pathway_ccplot(
 )
 }
 \arguments{
-\item{data}{R clusterprofiler package for KEGG and GO results}
+\item{data}{R clusterprofiler package for KEGG and GO results
+The data format must be S4 object with KEGG and GO results or
+a data frame with KEGG and GO results or
+a data frame with two columns.}
 
 \item{top}{According to the order of p adjust value from small to large
 the number of categories to show}
@@ -43,23 +46,9 @@ circle chart showed the results of GO and KEGG analysis
 }
 \examples{
 \dontrun{
-data(xfbdf, package = "TCMR")
-library(org.Hs.eg.db)
-library(clusterProfiler)
-library(DOSE)
-library(tidyverse)
-eg <- bitr(unique(xfbdf$target),
-  fromType = "SYMBOL",
-  toType = "ENTREZID",
-  OrgDb = "org.Hs.eg.db"
-)
-KK <- enrichKEGG(
-  gene = eg$ENTREZID,
-  organism = "hsa",
-  pvalueCutoff = 0.05
-)
-KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID")
-pathway_ccplot(KK)
+data("KK", package = "TCMR")
+library(ggraph)
+pathway_ccplot(KK, root = "KEGG")
 }
 
 }

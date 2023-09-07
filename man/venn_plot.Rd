@@ -7,6 +7,8 @@
 venn_plot(
   data,
   set.color = c("#FF8748", "#5BAA56", "#4186B7", "#8679BE", "#B8BB5B"),
+  name.size = 5,
+  text.size = 4,
   bar.color = "Set1",
   type = 1,
   vratio = c(0.65, 0.35),
@@ -29,12 +31,15 @@ venn.color7 <- c("#E41A1C", "#1E90FF", "#FF8C00", "#4DAF4A", "#75cbdc")
 venn.color8 <- c("#604192", "#139177", "#ed9e08", "#f56f08", "#4caecc")
 venn.color9 <- c("#d37a20", "#dbcb09", "#3a9cbc", "#dd7208", "#a30019")}
 
+\item{name.size}{name size}
+
+\item{text.size}{text size}
+
 \item{bar.color}{top column color}
 
-\item{type}{1, 2, 3
+\item{type}{1, 2
 1:take the intersection of 2-4 data sets
-2:take the intersection of 2-7 data sets
-3:take the intersection of >= 4 data sets}
+2:take the intersection of >= 4 data sets}
 
 \item{vratio}{The ratio of the histogram to the size of the matrix}
 
@@ -49,5 +54,5 @@ Intersection of datasets
 \examples{
 library(UpSetR)
 data(venn.data, package = "TCMR")
-venn_plot(venn.data, type = 3)
+venn_plot(venn.data, type = 1)
 }

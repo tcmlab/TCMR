@@ -9,8 +9,16 @@
 #' @return figure
 #' @export
 #'
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 scale_fill_manual
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 position_nudge
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 element_blank
+#' @importFrom dplyr lead
+#' @importFrom dplyr mutate
 #' @importFrom ggsankey make_long
 #' @importFrom ggsankey geom_alluvial
 #' @importFrom ggsankey geom_alluvial_text
@@ -19,7 +27,7 @@
 #'
 #' @examples
 #' data("xfbdf", package = "TCMR")
-#' data <- xfbdf %>% sample_n(30, replace = FALSE)
+#' data <- xfbdf %>% dplyr::sample_n(30, replace = FALSE)
 #' tcm_alluvial(data, text.position = 1)
 tcm_alluvial <- function(data,
                          text.size = 3,
@@ -38,7 +46,7 @@ tcm_alluvial <- function(data,
       next_node = dplyr::lead(x), row.names = NULL
     )
   })) %>%
-    mutate(
+    dplyr::mutate(
       x = factor(x, names(data)),
       next_x = factor(next_x, names(data))
     ) %>%

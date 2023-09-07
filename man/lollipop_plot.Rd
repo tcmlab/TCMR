@@ -51,6 +51,14 @@ KK <- enrichKEGG(
   organism = "hsa",
   pvalueCutoff = 0.05
 )
+MF<- enrichGO(
+  gene = eg$ENTREZID,
+  "org.Hs.eg.db",
+  ont = "MF",
+  pvalueCutoff = 0.05,
+  readable = TRUE
+)
+lollipop_plot(MF, title = "Molecular Function", color = "Spectral")
 lollipop_plot(KK)
 }
 }

@@ -56,6 +56,6 @@ go.diff <- enrichGO(
   ont = "all",
   readable = TRUE
 )
-go_dotplot(go.diff)
+go_dotplot(go.diff, color = "Spectral")
 }
 }

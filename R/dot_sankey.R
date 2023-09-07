@@ -20,8 +20,22 @@
 #' @return figure
 #' @export
 #'
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 scale_colour_distiller
+#' @importFrom ggplot2 scale_size_continuous
+#' @importFrom ggplot2 scale_y_discrete
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 element_text
+#' @importFrom dplyr slice
+#' @importFrom dplyr distinct
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
+#' @importFrom dplyr arrange
 #' @importFrom ggsankey make_long
 #' @importFrom ggsankey geom_sankey
 #' @importFrom ggsankey geom_sankey_text
@@ -38,9 +52,10 @@
 #' library(DOSE)
 #' library(tidyverse)
 #' eg <- bitr(unique(xfbdf$target),
-#' fromType = "SYMBOL",
-#' toType = "ENTREZID",
-#' OrgDb = "org.Hs.eg.db")
+#'   fromType = "SYMBOL",
+#'   toType = "ENTREZID",
+#'   OrgDb = "org.Hs.eg.db"
+#' )
 #' KK <- enrichKEGG(
 #'   eg$ENTREZID,
 #'   organism = "hsa",
@@ -48,9 +63,10 @@
 #' )
 #' KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID")
 #' dot_sankey(KK)
+#' dot_sankey(kegg.filter)
 #' }
 dot_sankey <- function(data,
-                       top = 5,
+                       top = 8,
                        sankey.text.size = 3,
                        sankey.x.axis.text.position = 1,
                        sankey.x.axis.text.size = 12,
@@ -58,19 +74,28 @@ dot_sankey <- function(data,
                        dot.position = 8,
                        dot.lable = "Description",
                        dot.text.size = 12,
-                       dot.scale = 0.7,
+                       dot.scale = 0.9,
                        dot.x = 0.45,
-                       dot.y = 0.3,
+                       dot.y = 0.17,
                        dot.width = 0.5,
-                       dot.height = 0.5,
+                       dot.height = 0.63,
                        ...) {
-  data_dot <- data@result %>%
+  # data processing
+  if (isS4(data)) {
+    data <- data@result %>% tidyr::drop_na()
+  } else if (is.data.frame(data)) {
+    data <- data %>% tidyr::drop_na()
+  } else {
+    print("The data format must be S4 object or data frame.")
+  }
+  data_dot <- data %>%
     dplyr::slice(1:top) %>%
-    mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio))) %>%
+    tidyr::drop_na() %>%
+    dplyr::mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio))) %>%
     dplyr::arrange(richFactor, descreasing = TRUE) %>%
     dplyr::select("ID", "Description", "p.adjust", "Count", "richFactor")
-
-  data_dot$richFactor <- data_dot$richFactor %>% round(., 2)
+  data_dot$richFactor <- data_dot$richFactor %>% round(digits = 2)
+  # Start drawing Bubble Chart
   if (dot.lable == "Description") {
     p1 <- ggplot(
       data = data_dot,
@@ -83,10 +108,14 @@ dot_sankey <- function(data,
       scale_size_continuous(range = c(2, 6)) +
       theme_bw() +
       theme(
-        axis.text.x = element_text(angle = 0, hjust = 0.5, vjust = 0.5,
-                                   size = dot.text.size, colour = "black"),
-        axis.text.y = element_text(angle = 0, size = dot.text.size,
-                                   face = "plain", colour = "black")
+        axis.text.x = element_text(
+          angle = 0, hjust = 0.5, vjust = 0.5,
+          size = dot.text.size, colour = "black"
+        ),
+        axis.text.y = element_text(
+          angle = 0, size = dot.text.size,
+          face = "plain", colour = "black"
+        )
       ) +
       theme(axis.title = element_text(
         margin = margin(10, 5, 0, 0),
@@ -94,7 +123,6 @@ dot_sankey <- function(data,
         size = dot.text.size
       )) +
       scale_colour_distiller(palette = dot.color, direction = -1) +
-
       labs(x = "richFactor", y = "") +
       theme(
         axis.title = element_text(size = 12),
@@ -116,15 +144,19 @@ dot_sankey <- function(data,
       scale_size_continuous(range = c(2, 6)) +
       theme_bw() +
       theme(
-        axis.text.x = element_text(angle = 0,
-                                   hjust = 0.5,
-                                   vjust = 0.5,
-                                   size = dot.text.size,
-                                   colour = "black"),
-        axis.text.y = element_text(angle = 0,
-                                   size = dot.text.size,
-                                   face = "plain",
-                                   colour = "black")
+        axis.text.x = element_text(
+          angle = 0,
+          hjust = 0.5,
+          vjust = 0.5,
+          size = dot.text.size,
+          colour = "black"
+        ),
+        axis.text.y = element_text(
+          angle = 0,
+          size = dot.text.size,
+          face = "plain",
+          colour = "black"
+        )
       ) +
       theme(axis.title = element_text(
         margin = margin(10, 5, 0, 0),
@@ -143,17 +175,16 @@ dot_sankey <- function(data,
       )
   }
 
-  data_sankey <- data@result %>%
+  data_sankey <- data %>%
     dplyr::slice(1:top) %>%
-    mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio))) %>%
+    dplyr::mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio))) %>%
     dplyr::arrange(richFactor, descreasing = TRUE) %>%
     dplyr::select(geneID, dot.lable) %>%
     tidyr::separate_rows(geneID, sep = "/") %>%
     as.data.frame() %>%
-    distinct()
+    dplyr::distinct()
 
   df <- data_sankey %>% ggsankey::make_long(colnames(data_sankey))
-
   if (dot.lable == "Description") {
     df$node <- factor(df$node, levels = c(
       data_sankey$Description %>% unique(),
@@ -193,11 +224,14 @@ dot_sankey <- function(data,
     ggsankey::theme_sankey(base_size = 20) +
     scale_fill_manual(values = mycol2) +
     theme(axis.title = element_blank()) +
-    theme(axis.text.x = element_text(size = sankey.x.axis.text.size,
-                                     hjust = sankey.x.axis.text.position,
-                                     vjust = 10, colour = "black"))
+    theme(axis.text.x = element_text(
+      size = sankey.x.axis.text.size,
+      hjust = sankey.x.axis.text.position,
+      vjust = 10, colour = "black"
+    ))
   p3 <- p2 + theme(plot.margin = unit(c(0, dot.position, 0, 0),
-                                      units = "cm"))
+    units = "cm"
+  ))
   p4 <- cowplot::ggdraw() + cowplot::draw_plot(p3) +
     cowplot::draw_plot(p1,
       scale = dot.scale,

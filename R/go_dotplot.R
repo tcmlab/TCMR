@@ -12,8 +12,29 @@
 #' @return dotplot
 #' @export
 #'
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 scale_color_manual
+#' @importFrom ggplot2 scale_fill_manual
+#' @importFrom ggplot2 scale_y_continuous
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_col
+#' @importFrom ggplot2 scale_fill_gradientn
+#' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 xlab
+#' @importFrom ggplot2 ylab
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 element_rect
+#' @importFrom ggplot2 scale_y_discrete
+#' @importFrom ggplot2 scale_x_discrete
+#' @importFrom ggplot2 coord_flip
+#' @importFrom ggplot2 expansion
+#' @importFrom ggplot2 facet_grid
+#' @importFrom dplyr mutate
+#' @importFrom dplyr group_by
+#' @importFrom tidyr drop_na
 #' @importFrom stringr str_wrap
 #' @importFrom RColorBrewer brewer.pal
 #'
@@ -37,7 +58,7 @@
 #'   ont = "all",
 #'   readable = TRUE
 #' )
-#' go_dotplot(go.diff)
+#' go_dotplot(go.diff, color = "Spectral")
 #' }
 go_dotplot <- function(go.diff,
                        top = 5,
@@ -46,10 +67,19 @@ go_dotplot <- function(go.diff,
                        text.width = 35,
                        title = "GO enrichment of cluster", ...) {
   # data processing
-  go_enrich <- go.diff@result %>%
+  if (isS4(go.diff)) {
+    go.diff <- go.diff@result
+  } else if (is.data.frame(go.diff)) {
+    go.diff <- go.diff
+  } else {
+    print("The data format must be S4 object or data frame.")
+  }
+
+  go_enrich <- go.diff %>%
+    tidyr::drop_na() %>%
     dplyr::group_by(ONTOLOGY) %>%
-    top_n(n = top, wt = -log10(p.adjust)) %>%
-    mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio)))
+    top_n(n = top) %>%
+    dplyr::mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio)))
   go_enrich <- go_enrich[order(go_enrich$richFactor,
     decreasing = FALSE
   ), ]

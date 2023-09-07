@@ -6,7 +6,7 @@
 \usage{
 dot_sankey(
   data,
-  top = 5,
+  top = 8,
   sankey.text.size = 3,
   sankey.x.axis.text.position = 1,
   sankey.x.axis.text.size = 12,
@@ -14,11 +14,11 @@ dot_sankey(
   dot.position = 8,
   dot.lable = "Description",
   dot.text.size = 12,
-  dot.scale = 0.7,
+  dot.scale = 0.9,
   dot.x = 0.45,
-  dot.y = 0.3,
+  dot.y = 0.17,
   dot.width = 0.5,
-  dot.height = 0.5,
+  dot.height = 0.63,
   ...
 )
 }
@@ -68,9 +68,10 @@ library(org.Hs.eg.db)
 library(DOSE)
 library(tidyverse)
 eg <- bitr(unique(xfbdf$target),
-fromType = "SYMBOL",
-toType = "ENTREZID",
-OrgDb = "org.Hs.eg.db")
+  fromType = "SYMBOL",
+  toType = "ENTREZID",
+  OrgDb = "org.Hs.eg.db"
+)
 KK <- enrichKEGG(
   eg$ENTREZID,
   organism = "hsa",
@@ -78,5 +79,6 @@ KK <- enrichKEGG(
 )
 KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID")
 dot_sankey(KK)
+dot_sankey(kegg.filter)
 }
 }

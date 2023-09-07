@@ -52,6 +52,7 @@ if (getRversion() >= "2.15.1") {
     "weight",
     ".",
     "ID",
+    "id",
     "logP",
     "next_node",
     "next_x",
@@ -83,8 +84,32 @@ if (getRversion() >= "2.15.1") {
     "node.size",
     "node1.node.branch",
     "y",
-    "ratio"
+    "ratio",
+    "tail",
+    "node.name",
+    "gather_graph_edge",
+    "KK",
+    "degree",
+    "TF",
+    "Target",
+    "newdata",
+    "trrust",
+    "herb_pm",
+    "flavor_color",
+    "flavor.number",
+    "property",
+    "property.color",
+    "meridian.number",
+    "meridian.color",
+    "dose.color",
+    "color.num",
+    "list1",
+    "list2",
+    "list3",
+    "meridian.label1",
+    "meridian.label2",
+    "meridian.label3",
+    "flavor.label1",
+    "flavor.label2"
   ))
 }
-
-

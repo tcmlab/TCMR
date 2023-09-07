@@ -77,15 +77,15 @@ KK <- enrichKEGG(
   pvalueCutoff = 0.05
 )
 KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID") \%>\%
-  mutate(richFactor = Count / as.numeric(sub("/\\\\d+", "", BgRatio)))
-path <- separate_rows(KK@result, geneID, sep = "/")
-data_alluvial <- left_join(xfbdf, path,
+  dplyr::mutate(richFactor = Count / as.numeric(sub("/\\\\d+", "", BgRatio)))
+path <- tidyr::separate_rows(KK@result, geneID, sep = "/")
+data_alluvial <- dplyr::left_join(xfbdf, path,
   by = c("target" = "geneID"),
   relationship = "many-to-many"
 ) \%>\%
-  distinct() \%>\%
-  drop_na() \%>\%
-  sample_n(30, replace = FALSE) \%>\%
+  dplyr::distinct() \%>\%
+  tidyr::drop_na() \%>\%
+  dplyr::sample_n(30, replace = FALSE) \%>\%
   as.data.frame()
 tcm_alluvial_dot(data_alluvial)
 }

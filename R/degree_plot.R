@@ -25,8 +25,27 @@
 #' @return bar plot
 #' @export
 #'
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_bar
+#' @importFrom ggplot2 scale_color_gradientn
+#' @importFrom ggplot2 scale_size_continuous
+#' @importFrom ggplot2 scale_x_discrete
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 xlab
+#' @importFrom ggplot2 ylab
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 element_blank
+#' @importFrom ggplot2 scale_y_continuous
+#' @importFrom ggplot2 guide_colorbar
+#' @importFrom ggplot2 scale_y_discrete
+#' @importFrom ggplot2 coord_flip
+#' @importFrom dplyr mutate
+#' @importFrom dplyr select
+#' @importFrom dplyr group_by
+#' @importFrom dplyr desc
 #' @importFrom stringr str_wrap
 #'
 #' @examples
@@ -40,23 +59,23 @@ degree_plot <- function(data,
                         title = "the degree of networks",
                         ...) {
   # data processing
-  deg <- data %>% mutate(., value = 1)
+  deg <- data %>% dplyr::mutate(., value = 1)
   herb_degree <- aggregate(deg$value, by = list(deg$herb), length) %>%
     as.data.frame() %>%
-    mutate(., type = "herb")
+    dplyr::mutate(., type = "herb")
   molecule_degree <- aggregate(deg$value, by = list(deg$molecule), length) %>%
     as.data.frame() %>%
-    mutate(., type = "molecule")
+    dplyr::mutate(., type = "molecule")
   target_degree <- aggregate(deg$value, by = list(deg$target), length) %>%
     as.data.frame() %>%
-    mutate(., type = "target")
+    dplyr::mutate(., type = "target")
   deg2 <- rbind(herb_degree, molecule_degree, target_degree)
   colnames(deg2) <- c("id", "degree", "type")
   deg3 <- deg2 %>%
     dplyr::select("id", "type", "degree") %>%
     as.data.frame()
   data_sorted <- deg3 %>%
-    group_by(type) %>%
+    dplyr::group_by(type) %>%
     top_n(top, wt = degree) %>%
     arrange(., type, desc(degree))
   data_sorted$id <- factor(data_sorted$id, levels = data_sorted$id)

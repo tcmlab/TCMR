@@ -9,7 +9,7 @@
 A visualization tool for network pharmacology data analysis.
 }
 \author{
-\strong{Maintainer}: Jinkun Liu \email{liujinku007@163.com} (\href{https://orcid.org/0000-0003-2212-9617}{ORCID})
+\strong{Maintainer}: Jinkun Liu \email{liujinkun007@gmail.com} (\href{https://orcid.org/0000-0003-2212-9617}{ORCID})
 
 }
 \keyword{internal}

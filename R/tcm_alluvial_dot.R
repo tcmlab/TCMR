@@ -19,8 +19,21 @@
 #' @return figure
 #' @export
 #'
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 scale_color_gradientn
+#' @importFrom ggplot2 scale_size_continuous
+#' @importFrom ggplot2 scale_y_discrete
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 scale_colour_distiller
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
+#' @importFrom dplyr sample_n
 #' @importFrom ggsankey make_long
 #' @importFrom ggsankey geom_alluvial
 #' @importFrom ggsankey geom_alluvial_text
@@ -47,40 +60,40 @@
 #'   pvalueCutoff = 0.05
 #' )
 #' KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID") %>%
-#'   mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio)))
-#' path <- separate_rows(KK@result, geneID, sep = "/")
-#' data_alluvial <- left_join(xfbdf, path,
+#'   dplyr::mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio)))
+#' path <- tidyr::separate_rows(KK@result, geneID, sep = "/")
+#' data_alluvial <- dplyr::left_join(xfbdf, path,
 #'   by = c("target" = "geneID"),
 #'   relationship = "many-to-many"
 #' ) %>%
-#'   distinct() %>%
-#'   drop_na() %>%
-#'   sample_n(30, replace = FALSE) %>%
+#'   dplyr::distinct() %>%
+#'   tidyr::drop_na() %>%
+#'   dplyr::sample_n(30, replace = FALSE) %>%
 #'   as.data.frame()
 #' tcm_alluvial_dot(data_alluvial)
 #' }
 tcm_alluvial_dot <- function(data,
-                           alluvial.text.size = 3,
-                           alluvial.x.axis.text.position = 1,
-                           alluvial.x.axis.text.size = 12,
-                           molecule.lable = "molecule_id",
-                           dot.color = "RdBu",
-                           dot.position = 6,
-                           dot.lable = "Description",
-                           dot.text.size = 12,
-                           dot.scale = 0.72,
-                           dot.x = 0.59,
-                           dot.y = -0.173,
-                           dot.width = 0.48,
-                           dot.height = 1.33,
-                           ...) {
+                             alluvial.text.size = 3,
+                             alluvial.x.axis.text.position = 1,
+                             alluvial.x.axis.text.size = 12,
+                             molecule.lable = "molecule_id",
+                             dot.color = "RdBu",
+                             dot.position = 6,
+                             dot.lable = "Description",
+                             dot.text.size = 12,
+                             dot.scale = 0.72,
+                             dot.x = 0.59,
+                             dot.y = -0.173,
+                             dot.width = 0.48,
+                             dot.height = 1.33,
+                             ...) {
   # Data collation after KEGG or GO enrichment analysis
 
   data3 <- data %>%
     dplyr::select("ID", "Description", "p.adjust", "Count", "richFactor") %>%
-    distinct() %>%
-    arrange(p.adjust, descreasing = TRUE)
-  data3$richFactor <- data3$richFactor %>% round(., 2)
+    dplyr::distinct() %>%
+    dplyr::arrange(p.adjust, descreasing = TRUE)
+  data3$richFactor <- data3$richFactor %>% round(digits = 2)
 
   # bubble chart
   if (dot.lable == "Description") {
@@ -104,7 +117,7 @@ tcm_alluvial_dot <- function(data,
           colour = "black", hjust = 1
         )
       ) +
-      scale_colour_distiller(palette = dot.color, direction = -1) + # 更改配色
+      scale_colour_distiller(palette = dot.color, direction = -1) +
       labs(x = "richFactor", y = "") +
       theme_bw() +
       theme(
@@ -136,7 +149,7 @@ tcm_alluvial_dot <- function(data,
           colour = "black", hjust = 1
         )
       ) +
-      scale_colour_distiller(palette = dot.color, direction = -1) + # 更改配色
+      scale_colour_distiller(palette = dot.color, direction = -1) +
       labs(x = "richFactor", y = "") +
       theme_bw() +
       theme(
@@ -223,10 +236,10 @@ tcm_alluvial_dot <- function(data,
   p4 <- cowplot::ggdraw() +
     cowplot::draw_plot(p3) +
     cowplot::draw_plot(p1,
-                       scale = dot.scale,
-                       x = dot.x, y = dot.y,
-                       width = dot.width,
-                       height = dot.height
+      scale = dot.scale,
+      x = dot.x, y = dot.y,
+      width = dot.width,
+      height = dot.height
     )
   return(p4)
 }

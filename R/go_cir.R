@@ -24,6 +24,7 @@
 #' The text size of the numbers involved in this enrichment analysis
 #' @param p.color p adjust color
 #' @param p.cex The text size of padjust
+#' @param richFactor.cex The text size of richFactor
 #' @param legend.position legend position
 #' @param text.width legend text width
 #' @param ... additional parameters
@@ -31,13 +32,28 @@
 #' @return chord diagram
 #' @export
 #'
-#' @import circlize
-#' @import dplyr
+#' @importFrom circlize circos.par
+#' @importFrom circlize circos.genomicInitialize
+#' @importFrom circlize circos.genomicRect
+#' @importFrom circlize circos.track
+#' @importFrom circlize get.cell.meta.data
+#' @importFrom circlize circos.text
+#' @importFrom circlize colorRamp2
+#' @importFrom circlize circos.clear
+#' @importFrom circlize circos.genomicTrackPlotRegion
+#' @importFrom circlize circos.lines
+#' @importFrom circlize circos.genomicTrack
+#' @importFrom dplyr mutate
+#' @importFrom dplyr group_by
+#' @importFrom dplyr slice
+#' @importFrom dplyr arrange
 #' @importFrom grDevices colorRampPalette
 #' @importFrom stringr str_split
 #' @importFrom ComplexHeatmap Legend
 #' @importFrom ComplexHeatmap packLegend
 #' @importFrom stringr str_wrap
+#' @importFrom stringr str_split
+#' @importFrom tidyr drop_na
 #' @importFrom grid gpar
 #' @importFrom grid pushViewport
 #' @importFrom grid grid.draw
@@ -76,19 +92,28 @@ go_cir <- function(
     ratio.cex = 0.8,
     p.color = c("#eda9aa", "#c25254"),
     p.cex = 0.8,
+    richFactor.cex = 0.7,
     legend.position = c(0.8, 0.45),
     text.width = 35,
     ...) {
   # data processing
-  go_enrich <- go.diff@result %>%
+  if (isS4(go.diff)) {
+    go.diff <- go.diff@result %>% tidyr::drop_na()
+  } else if (is.data.frame(go.diff)) {
+    go.diff <- go.diff %>% tidyr::drop_na()
+  } else {
+    print("The data format must be S4 object or data frame.")
+  }
+  go_enrich <- go.diff %>%
     dplyr::group_by(ONTOLOGY) %>%
-    dplyr::top_n(n = top, wt = -log10(p.adjust)) %>%
+    dplyr::slice(1:top) %>%
     dplyr::mutate(RichFactor = Count / as.numeric(sub(
       "/\\d+", "",
       BgRatio
     ))) %>%
+    dplyr::distinct(p.adjust, RichFactor, .keep_all = TRUE) %>%
     as.data.frame()
-
+  go_enrich$RichFactor <- go_enrich$RichFactor %>% round(digits = 2)
   go_enrich$left <- 0
   go_enrich$this_pathway_gene <- go_enrich$BgRatio %>%
     sapply(function(x) {
@@ -109,11 +134,11 @@ go_cir <- function(
   go_enrich$ONTOLOGY <- factor(go_enrich$ONTOLOGY,
     levels = sort(unique(go_enrich$ONTOLOGY))
   )
-  go_enrich <- go_enrich %>% arrange(ONTOLOGY, desc(RichFactor))
+  go_enrich <- go_enrich %>% dplyr::arrange(ONTOLOGY, desc(RichFactor))
   rownames(go_enrich) <- go_enrich$ID
 
   # start drawing
-  plotdata <- go_enrich
+  plotdata <- go_enrich %>% drop_na()
   circos.clear()
   circos.par(
     canvas.xlim = c(-0.2, 1.2),
@@ -148,21 +173,16 @@ go_cir <- function(
     }
   )
   ### The second circle: How many genes are there in total in this pathway
+  plotdata2 <- plotdata[, c("ID", "left", "this_pathway_gene")]
   circos.genomicTrackPlotRegion(
-    plotdata[, c("ID", "left", "this_pathway_gene")],
+    plotdata2,
     track.height = 0.08, bg.border = NA,
     stack = TRUE,
     panel.fun = function(region, value, ...) {
       circos.genomicRect(region, value, col = gene.color, border = NA, ...)
       ylim <- get.cell.meta.data("ycenter")
-      xlim <- plotdata[, c(
-        "ID", "left",
-        "this_pathway_gene"
-      )][get.cell.meta.data("sector.index"), 3] / 2
-      sector.name <- plotdata[, c(
-        "ID", "left",
-        "this_pathway_gene"
-      )][get.cell.meta.data("sector.index"), 3]
+      xlim <- plotdata2[get.cell.meta.data("sector.index"), 3] / 2
+      sector.name <- plotdata2[get.cell.meta.data("sector.index"), 3]
       circos.text(xlim, ylim, sector.name,
         cex = gene.cex, niceFacing = TRUE
       )
@@ -193,7 +213,6 @@ go_cir <- function(
       )
 
       ylim <- get.cell.meta.data("ycenter")
-
       xlim <- plotdata3[get.cell.meta.data("sector.index"), "len"] / 2
       sector.name <- plotdata3[get.cell.meta.data("sector.index"), "Count"]
       circos.text(xlim, ylim, sector.name, cex = ratio.cex, niceFacing = TRUE)
@@ -214,7 +233,15 @@ go_cir <- function(
   plotdata4$relative_value <-
     plotdata4$p.adjust_neg / max(plotdata4$p.adjust_neg) * total.len
 
-  p_max <- max(plotdata4$p.adjust_neg) %>% ceiling()
+  #round up integer-valued function
+  my_ceiling <- function(x) {
+    if (x > 0 & x - as.integer(x) != 0) {
+      return(as.integer(x) + 1)
+    } else {
+      return(as.integer(x))
+    }
+  }
+  p_max <- max(plotdata4$p.adjust_neg) %>% my_ceiling()
   colorsChoice <- colorRampPalette(p.color)
   color_assign <- colorRamp2(
     breaks = 0:p_max,
@@ -244,15 +271,7 @@ go_cir <- function(
       sector.name <- plotdata4[
         get.cell.meta.data("sector.index"),
         "p.adjust_neg"
-      ] %>% round(2)
-
-      tmpx <- -log10(0.01) / max(plotdata4$p.adjust_neg) * total.len
-      circos.lines(c(tmpx, tmpx), c(
-        get.cell.meta.data("ylim")[1],
-        get.cell.meta.data("ylim")[2]
-      ),
-      col = "gray", lwd = 0.45
-      )
+      ] %>% round(digits = 2)
       circos.text(xlim, ylim, sector.name,
         cex = p.cex, niceFacing = TRUE
       )
@@ -266,7 +285,7 @@ go_cir <- function(
   circos.genomicTrack(
     plotdata5,
     ylim = c(0, max(plotdata5$RichFactor)),
-    track.height = 0.4, bg.col = "gray95", bg.border = NA,
+    track.height = 0.45, bg.col = "gray95", bg.border = NA,
     panel.fun = function(region, value, ...) {
       sector.name <- get.cell.meta.data("sector.index")
       circos.genomicRect(region, value,
@@ -275,6 +294,16 @@ go_cir <- function(
         ytop.column = 1,
         ybottom = 0, ...
       )
+      ylim <- plotdata5[
+        get.cell.meta.data("sector.index"),
+        "RichFactor"
+      ] / 2
+      xlim <- get.cell.meta.data("xcenter")
+      sector.name <- plotdata5[
+        get.cell.meta.data("sector.index"),
+        "RichFactor"
+      ]
+      circos.text(xlim, ylim, sector.name, cex = richFactor.cex, niceFacing = TRUE)
     }
   )
 
@@ -286,9 +315,9 @@ go_cir <- function(
         plotdata$ONTOLOGY, ":",
         rep(
           c(
-            "Molecular function",
+            "Biological process",
             "Cellular component",
-            "Biological process"
+            "Molecular function"
           ),
           each = top
         )

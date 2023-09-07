@@ -41,13 +41,13 @@ equal to degree will be displayed.}
 \item{rem.dis.inter}{remove single free unconnected nodes}
 
 \item{graph.layout}{Network Diagram Layout:
-"kk", nicely", "grid","sphere", "randomly",
-"bipartite", "star","tree", nicely", "grid",
-"sphere", "randomly","gem", "graphopt","lgl",
+"kk", "nicely", "sphere", "circle",
+"bipartite", "star","tree", "randomly",
+"gem", "graphopt","lgl", "grid",
 "mds", "sugiyama"}
 }
 \value{
-figure: network diagrams
+network diagrams
 }
 \description{
 Protein-protein interaction analysis
@@ -55,17 +55,8 @@ Protein-protein interaction analysis
 \examples{
 \dontrun{
 data(string, package = "TCMR")
-data <- string \%>\%
-  dplyr::rename(
-    from = X.node1,
-    to = node2,
-    weight = combined_score
-  ) \%>\%
-  dplyr::select(from, to, weight) \%>\%
-  dplyr::distinct()
-
-ppi_plot(data, label.repel = FALSE)
-ppi_plot(data,
+ppi_plot(string, label.repel = FALSE)
+ppi_plot(string,
   label.degree = 1,
   nodes.color = "Spectral",
   label.repel = TRUE

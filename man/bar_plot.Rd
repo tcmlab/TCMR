@@ -46,6 +46,9 @@ Bar graphs showed the results of GO and KEGG analysis
 \examples{
 \dontrun{
 data(xfbdf, package = "TCMR")
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(DOSE)
 eg <- bitr(unique(xfbdf$target),
   fromType = "SYMBOL",
   toType = "ENTREZID",
@@ -64,7 +67,8 @@ BP <- enrichGO(
   pvalueCutoff = 0.05,
   readable = TRUE
 )
-bar_plot(KK,title = "KEGG")
-bar_plot(BP,title = "biological process")
+bar_plot(KK)
+bar_plot(KK@result[c( 11, 15, 17, 33, 41, 42, 47, 48,52, 53), ], title = "KEGG", color = "Spectral")
+bar_plot(BP@result[2:11,], title = "biological process", color = "Spectral")
 }
 }

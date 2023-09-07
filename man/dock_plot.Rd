@@ -43,7 +43,7 @@ data <- matrix(rnorm(81), 9, 9)
 data[1:9, seq(1, 9, 2)] <- data[1:9, seq(1, 9, 2)] - 4
 colnames(data) <- paste("molecule", 1:9, sep = "")
 rownames(data) <- paste("target", 1:9, sep = "")
-data <- round(data, 2)
+data <- round(data, digits = 2)
 dock_plot(data)
 dock_plot(data, shape = "circle", legend.height = 3)
 }

@@ -1,7 +1,11 @@
 #' Display the relationship between genes and pathways
 #' enriched by KEGG or GO in the form of a chord diagram
 #'
-#' @param data data.frame
+#' @param data  R clusterprofiler package for KEGG and GO results
+#' The data format must be S4 object with KEGG and GO results or
+#' a data frame with KEGG and GO results or
+#' a data frame with two columns.
+#'
 #' @param top According to the order of p adjust value from small to large
 #' the number of categories to show
 #' @param start.degree the angle at which the circle plot starts
@@ -14,8 +18,19 @@
 #' @return chord diagram
 #' @export
 #'
-#' @import circlize
-#' @import dplyr
+#' @importFrom circlize circos.par
+#' @importFrom circlize chordDiagram
+#' @importFrom circlize circos.track
+#' @importFrom circlize get.cell.meta.data
+#' @importFrom circlize circos.text
+#' @importFrom circlize colorRamp2
+#' @importFrom circlize get.all.sector.index
+#' @importFrom circlize circos.clear
+#' @importFrom dplyr mutate
+#' @importFrom dplyr group_by
+#' @importFrom dplyr top_n
+#' @importFrom dplyr arrange
+#' @importFrom dplyr select
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom cowplot ggdraw
@@ -48,23 +63,53 @@ pathway_cirplot <- function(data,
                             text.width = 15,
                             text.size = 0.6,
                             color = "RdBu", ...) {
-  df <- separate_rows(data@result[1:top, ], geneID, sep = "/") %>%
-    mutate(col = "grey")
-  gene_col <- df$col %>% head(length(unique(df$geneID)))
-  names(gene_col) <- unique(df$geneID)
-  circlize::circos.par(
-    canvas.xlim = c(-1, 1),
-    canvas.ylim = c(-1, 1),
-    start.degree = start.degree
-  )
-  if (label.name == "ID") {
-    df <- df %>% dplyr::select(ID, geneID)
-    cols_number <- length(unique(df$ID))
-    cols <- brewer.pal(ifelse(cols_number > 8, 8, cols_number), color)
-    pathway_col <- colorRampPalette(cols)(length(unique(df$ID)))
-    names(pathway_col) <- unique(df$ID)
-  } else if (label.name == "Description") {
-    df <- df %>% dplyr::select(Description, geneID)
+  # data processing
+  if (isS4(data)) {
+    data <- data@result %>% tidyr::drop_na()
+  } else if (is.data.frame(data)) {
+    data <- data %>% tidyr::drop_na()
+  } else {
+    print("The data format must be S4 object or data frame.")
+  }
+  if (all(c("ID", "Description", "geneID") %in% colnames(data))) {
+    df <- separate_rows(data[1:top, ], geneID, sep = "/") %>%
+      dplyr::mutate(col = "grey") %>%
+      dplyr::distinct()
+    gene_col <- df$col %>% head(length(unique(df$geneID)))
+    names(gene_col) <- unique(df$geneID)
+
+    if (label.name == "ID") {
+      df <- df %>% dplyr::select(ID, geneID)
+      cols_number <- length(unique(df$ID))
+      cols <- brewer.pal(ifelse(cols_number > 8, 8, cols_number), color)
+      pathway_col <- colorRampPalette(cols)(length(unique(df$ID)))
+      names(pathway_col) <- unique(df$ID)
+    } else if (label.name == "Description") {
+      df <- df %>% dplyr::select(Description, geneID)
+      df$Description <- lapply(
+        strwrap(df$Description,
+          width = text.width,
+          simplify = FALSE
+        ),
+        paste,
+        collapse = "\n"
+      )
+      cols_number <- length(unique(df$Description))
+      cols <- brewer.pal(ifelse(cols_number > 8, 8, cols_number), color)
+      pathway_col <- colorRampPalette(cols)(length(unique(df$Description)))
+      names(pathway_col) <- unique(df$Description)
+    } else {
+      print("The label.name is ID' or 'Description'. ")
+    }
+  } else {
+    df <- separate_rows(data[1:top, ], 2, sep = "/")
+    colnames(df)[1:2] <- c("Description", "geneID")
+    df <- df %>%
+      dplyr::mutate(col = "grey")%>%
+      dplyr::distinct()
+    gene_col <- df$col %>% head(length(unique(df$geneID)))
+    names(gene_col) <- unique(df$geneID)
+
     df$Description <- lapply(
       strwrap(df$Description,
         width = text.width,
@@ -77,11 +122,15 @@ pathway_cirplot <- function(data,
     cols <- brewer.pal(ifelse(cols_number > 8, 8, cols_number), color)
     pathway_col <- colorRampPalette(cols)(length(unique(df$Description)))
     names(pathway_col) <- unique(df$Description)
-  } else {
-    print("The label.name is ID' or 'Description'. ")
   }
+
   grid.col <- c(pathway_col, gene_col)
   set.seed(1234)
+  circlize::circos.par(
+    canvas.xlim = c(-1, 1),
+    canvas.ylim = c(-1, 1),
+    start.degree = start.degree
+  )
   chordDiagram(df,
     grid.col = grid.col,
     link.decreasing = TRUE,
@@ -106,7 +155,7 @@ pathway_cirplot <- function(data,
       sector.index = si,
       track.index = 1,
       facing = "clockwise",
-      cex = 0.6,
+      cex = text.size,
       adj = c(0, 0.5),
       niceFacing = TRUE
     )

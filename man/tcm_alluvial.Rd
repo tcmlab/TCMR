@@ -31,6 +31,6 @@ Alluvial diagram
 }
 \examples{
 data("xfbdf", package = "TCMR")
-data <- xfbdf \%>\% sample_n(30, replace = FALSE)
+data <- xfbdf \%>\% dplyr::sample_n(30, replace = FALSE)
 tcm_alluvial(data, text.position = 1)
 }

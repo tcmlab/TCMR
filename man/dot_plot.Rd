@@ -52,14 +52,14 @@ KK <- enrichKEGG(
   pvalueCutoff = 0.05
 )
 KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID")
-BP <- enrichGO(
+CC<- enrichGO(
   gene = eg$ENTREZID,
   "org.Hs.eg.db",
-  ont = "BP",
+  ont = "CC",
   pvalueCutoff = 0.05,
   readable = TRUE
 )
 dot_plot(KK, title = "KEGG")
-dot_plot(BP, title = "biological process")
+dot_plot(CC, title = "cellular component", color = "Spectral")
 }
 }

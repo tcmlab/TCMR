@@ -14,6 +14,7 @@
 #' @param p.color padjust color
 #' @param p.cex The text size of padjust
 #' @param richFactor.color richFactor color
+#' @param richFactor.cex The text size of richFactor
 #' @param legend.position legend position
 #' @param text.width legend text width
 #' @param ... additional parameters
@@ -21,14 +22,25 @@
 #' @return chord diagram
 #' @export
 #'
-#' @import circlize
-#' @import dplyr
+#' @importFrom circlize circos.par
+#' @importFrom circlize circos.genomicInitialize
+#' @importFrom circlize circos.genomicRect
+#' @importFrom circlize circos.track
+#' @importFrom circlize get.cell.meta.data
+#' @importFrom circlize circos.text
+#' @importFrom circlize colorRamp2
+#' @importFrom circlize circos.clear
+#' @importFrom dplyr mutate
+#' @importFrom dplyr arrange
+#' @importFrom dplyr desc
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom stringr str_split
 #' @importFrom ComplexHeatmap Legend
 #' @importFrom ComplexHeatmap packLegend
 #' @importFrom stringr str_wrap
+#' @importFrom stringr str_split
+#' @importFrom tidyr drop_na
 #' @importFrom grid gpar
 #' @importFrom grid pushViewport
 #' @importFrom grid grid.draw
@@ -53,25 +65,32 @@
 #' cir_plot(KK)
 #' }
 cir_plot <- function(data,
-                     top = 20,
+                     top = 15,
                      id.color = "RdBu",
                      id.cex = 0.8,
                      gene.color = "#CFB0D4",
-                     gene.cex = 1,
+                     gene.cex = 0.8,
                      ratio.color = c("#6291bd", "#B1D1E7"),
-                     ratio.cex = 1,
+                     ratio.cex = 0.8,
                      p.color = c("#eda9aa", "#c25254"),
-                     p.cex = 1,
+                     p.cex = 0.8,
                      richFactor.color = "RdBu",
+                     richFactor.cex = 0.7,
                      legend.position = c(0.8, 0.45),
                      text.width = 35,
                      ...) {
   # data processing
-  enrich.res <- data@result
+  if (isS4(data)) {
+    enrich.res <- data@result
+  } else if (is.data.frame(data)) {
+    enrich.res <- data
+  } else {
+    print("The data format must be S4 object or data frame.")
+  }
   enrich.res$left <- 0
   enrich.res$this_pathway_gene <- enrich.res$BgRatio %>%
     sapply(function(x) {
-      str_split(x, "/")[[1]][1]
+      stringr::str_split(x, "/")[[1]][1]
     }) %>%
     as.numeric()
   enrich.res$all_pathway_gene <- enrich.res$BgRatio %>%
@@ -85,15 +104,17 @@ cir_plot <- function(data,
     }) %>%
     as.numeric()
   enrich.res$right <- max(enrich.res$this_pathway_gene)
-  enrich.res <- mutate(enrich.res,
-    richFactor = Count / as.numeric(sub(
-      "/\\d+",
-      "", BgRatio
-    ))
-  )
-  enrich.res <- enrich.res %>% arrange(desc(richFactor))
+  enrich.res <- enrich.res %>%
+    dplyr::mutate(
+      richFactor = Count / as.numeric(sub(
+        "/\\d+",
+        "", BgRatio
+      ))
+    ) %>%
+    dplyr::arrange(dplyr::desc(richFactor))
+  enrich.res$richFactor <- enrich.res$richFactor %>% round(digits = 2)
   rownames(enrich.res) <- enrich.res$ID
-  enrich.res <- enrich.res[1:top, ]
+  enrich.res <- enrich.res[1:top, ] %>% drop_na()
 
   # start drawing
   plotdata <- enrich.res
@@ -114,7 +135,7 @@ cir_plot <- function(data,
   ID_col <- colorRampPalette(col)(length(unique(enrich.res$ID)))
   names(ID_col) <- unique(enrich.res$ID)
   circlize::circos.genomicInitialize(plotdata[, c("ID", "left", "right")],
-    plotType = NULL
+                                     plotType = NULL
   )
   circlize::circos.track(
     ylim = c(0, 1), track.height = 0.08, bg.border = NA, bg.col = ID_col,
@@ -127,30 +148,23 @@ cir_plot <- function(data,
   )
 
   # The second circle: how many genes are there in total in this pathway
+  plotdata2 <- plotdata[, c("ID", "left", "this_pathway_gene")]
   circlize::circos.genomicTrackPlotRegion(
-    plotdata[, c("ID", "left", "this_pathway_gene")],
+    plotdata2,
     track.height = 0.08, bg.border = NA,
     stack = TRUE,
     panel.fun = function(region, value, ...) {
       circos.genomicRect(region, value,
-        col = gene.color,
-        border = NA, ...
+                         col = gene.color,
+                         border = NA, ...
       )
       ylim <- get.cell.meta.data("ycenter")
-      xlim <- plotdata[, c(
-        "ID",
-        "left",
-        "this_pathway_gene"
-      )][get.cell.meta.data("sector.index"), 3] / 2
-      sector.name <- plotdata[, c(
-        "ID",
-        "left",
-        "this_pathway_gene"
-      )][get.cell.meta.data("sector.index"), 3]
+      xlim <- plotdata2[get.cell.meta.data("sector.index"), 3] / 2
+      sector.name <- plotdata2[get.cell.meta.data("sector.index"), 3]
       circos.text(xlim, ylim,
-        sector.name,
-        cex = gene.cex,
-        niceFacing = TRUE
+                  sector.name,
+                  cex = gene.cex,
+                  niceFacing = TRUE
       )
     }
   )
@@ -175,19 +189,20 @@ cir_plot <- function(data,
     panel.fun = function(region, value, ...) {
       circos.genomicRect(region, value,
                          col = color_assign(value),
-                         border = NA, ...)
+                         border = NA, ...
+      )
 
       ylim <- get.cell.meta.data("ycenter")
       xlim <- plotdata3[get.cell.meta.data("sector.index"), "len"] / 2
       sector.name <- plotdata3[get.cell.meta.data("sector.index"), "Count"]
-      circos.text(xlim, ylim, sector.name, cex = 1.0, niceFacing = TRUE)
+      circos.text(xlim, ylim, sector.name, cex = ratio.cex, niceFacing = TRUE)
 
       xlim <- plotdata3[get.cell.meta.data("sector.index"), "len"] +
         plotdata3[get.cell.meta.data("sector.index"), "len2"] / 2
       sector.name <- plotdata3[get.cell.meta.data("sector.index"), "DEGnum"] -
         plotdata3[get.cell.meta.data("sector.index"), "Count"]
       circos.text(xlim, ylim, sector.name,
-        cex = ratio.cex, niceFacing = TRUE
+                  cex = ratio.cex, niceFacing = TRUE
       )
     }
   )
@@ -199,10 +214,20 @@ cir_plot <- function(data,
   plotdata4$relative_value <-
     plotdata4$p.adjust_neg / max(plotdata4$p.adjust_neg) * total.len
 
-  p_max <- max(plotdata4$p.adjust_neg) %>% ceiling()
+  #round up integer-valued function
+  my_ceiling <- function(x) {
+    if (x > 0 & x - as.integer(x) != 0) {
+      return(as.integer(x) + 1)
+    } else {
+      return(as.integer(x))
+    }
+  }
+  p_max <- max(plotdata4$p.adjust_neg) %>% my_ceiling()
   colorsChoice <- grDevices::colorRampPalette(p.color)
-  color_assign <- colorRamp2(breaks = 0:p_max,
-                             colors = colorsChoice(p_max + 1))
+  color_assign <- colorRamp2(
+    breaks = 0:p_max,
+    colors = colorsChoice(p_max + 1)
+  )
 
   plotdata4 <- plotdata4[, c(
     "ID",
@@ -216,10 +241,9 @@ cir_plot <- function(data,
     track.height = 0.08, bg.border = NA, stack = TRUE,
     panel.fun = function(region, value, ...) {
       circos.genomicRect(region, value,
-        col = color_assign(value),
-        border = NA, ...
+                         col = color_assign(value),
+                         border = NA, ...
       )
-
       ylim <- get.cell.meta.data("ycenter")
       xlim <- plotdata4[
         get.cell.meta.data("sector.index"),
@@ -229,14 +253,7 @@ cir_plot <- function(data,
         get.cell.meta.data("sector.index"),
         "p.adjust_neg"
       ] %>%
-        round(2)
-
-      tmpx <- -log10(0.01) / max(plotdata4$p.adjust_neg) * total.len
-      circos.lines(c(tmpx, tmpx),
-        c(get.cell.meta.data("ylim")[1], get.cell.meta.data("ylim")[2]),
-        col = "gray", lwd = 0.45
-      )
-
+        round(digits = 2)
       circos.text(xlim, ylim, sector.name, cex = p.cex, niceFacing = TRUE)
     }
   )
@@ -255,19 +272,27 @@ cir_plot <- function(data,
   circlize::circos.genomicTrack(
     plotdata5,
     ylim = c(0, max(plotdata5$richFactor)),
-    track.height = max(plotdata5$richFactor),
+    track.height = 0.45,
     bg.col = "gray95",
     bg.border = NA,
     panel.fun = function(region, value, ...) {
       sector.name <- get.cell.meta.data("sector.index")
       circos.genomicRect(region, value,
-        col = color_assign[label_data[sector.name, 1]],
-        border = NA, ytop.column = 1, ybottom = 0, ...
+                         col = color_assign[label_data[sector.name, 1]],
+                         border = NA, ytop.column = 1, ybottom = 0, ...
       )
-      circos.lines(c(0, max(region)), c(0.5, 0.5), col = "gray", lwd = 0.3)
+      ylim <- plotdata5[
+        get.cell.meta.data("sector.index"),
+        "richFactor"
+      ] / 2
+      xlim <- get.cell.meta.data("xcenter")
+      sector.name <- plotdata5[
+        get.cell.meta.data("sector.index"),
+        "richFactor"
+      ]
+      circos.text(xlim, ylim, sector.name, cex = richFactor.cex, niceFacing = TRUE)
     }
   )
-
 
   # draw legend
   label.text <- as.character(unique(paste0(

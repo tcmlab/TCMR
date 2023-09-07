@@ -9,11 +9,13 @@
 #'
 #' @return data.frame
 #' @export
-#' @import dplyr
+#' @importFrom dplyr filter
+#' @importFrom dplyr distinct
+#' @importFrom dplyr select
 #' @importFrom tidyr drop_na
 #' @examples
 #' herbs <- c("ma huang", "ku xing ren")
-#' fufang <- herb_target(herbs, type ="Herb_name_pin_yin")
+#' fufang <- herb_target(herbs, type = "Herb_name_pin_yin")
 #' head(fufang)
 herb_target <- function(herb,
                         OB.value = 30,

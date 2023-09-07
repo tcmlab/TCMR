@@ -10,8 +10,19 @@
 #'
 #' @return figure
 #' @export
-#' @import circlize
-#' @import dplyr
+#' @importFrom circlize circos.par
+#' @importFrom circlize circos.initialize
+#' @importFrom circlize circos.trackPlotRegion
+#' @importFrom circlize get.cell.meta.data
+#' @importFrom circlize circos.text
+#' @importFrom circlize highlight.sector
+#' @importFrom circlize colorRamp2
+#' @importFrom circlize circos.clear
+#' @importFrom dplyr mutate
+#' @importFrom dplyr group_by
+#' @importFrom dplyr top_n
+#' @importFrom dplyr arrange
+#' @importFrom dplyr select
 #' @importFrom utils data
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
@@ -36,8 +47,9 @@ tcm_comp <- function(data,
   data$label <- paste0(data$weight, " g")
   # Set to take two digits after the decimal point
   data$ratio <- paste0(base::format(data$weight / sum(data$weight) * 100,
-    digits = 2, nsmall = 2
-  ), "%") %>% as.character()
+                                    digits = 2, nsmall = 2
+  ), "%") %>%
+    as.character()
   # color settings
   plot.color <- grDevices::colorRampPalette(
     if (nrow(data) <= 8) {
@@ -59,7 +71,7 @@ tcm_comp <- function(data,
   circlize::circos.par(
     "start.degree" = start.degree,
     points.overflow.warning = FALSE
-  ) # 设置起始角度
+  ) # set the starting angle
   circlize::circos.initialize(
     factors = data$herb,
     xlim = sector_lim

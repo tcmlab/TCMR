@@ -6,7 +6,9 @@
 #' @return data.frame
 #' @export
 #'
-#' @import dplyr
+#' @importFrom dplyr select
+#' @importFrom dplyr rename
+#' @importFrom dplyr mutate
 #' @importFrom tidyr drop_na
 #' @importFrom stringr str_extract
 #' @importFrom stringr str_trim
@@ -16,7 +18,7 @@
 #' data <- etcm(mahuang, herb = "ma huang")
 #' head(data)
 etcm <- function(data, herb = NULL) {
-  data <- data %>% drop_na()
+  data <- data %>% tidyr::drop_na()
   # data cleaning
   if ("Chemical Component" %in% colnames(data)) {
     df2 <- lapply(

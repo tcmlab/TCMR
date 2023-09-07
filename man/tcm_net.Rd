@@ -39,10 +39,10 @@ equal to degree will be displayed.}
 
 \item{edge.width}{edge width}
 
-\item{graph.layout}{etwork Diagram Layout:
-"kk", nicely", "grid","sphere", "randomly",
-"bipartite", "star","tree", nicely", "grid",
-"sphere", "randomly","gem", "graphopt","lgl",
+\item{graph.layout}{Network Diagram Layout:
+"kk", "nicely", "circle", "sphere",
+"bipartite", "star", "tree", "randomly",
+"gem", "graphopt","lgl", "grid",
 "mds", "sugiyama"}
 
 \item{rem.dis.inter}{remove single free unconnected nodes}
@@ -60,6 +60,8 @@ network.data <- xfbdf \%>\%
   dplyr::select(herb, molecule, target) \%>\%
   sample_n(100, replace = FALSE) \%>\%
   as.data.frame()
-tcm_net(network.data, rem.dis.inter = TRUE)
+tcm_net(network.data, node.color= "Spectral",
+label.degree = 1, rem.dis.inter = TRUE,graph.layout = "grid",
+label.size = 3)
 }
 }

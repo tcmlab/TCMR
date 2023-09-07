@@ -7,7 +7,9 @@
 #'
 #' @return data.frame
 #' @export
-#' @import dplyr
+#' @importFrom dplyr filter
+#' @importFrom dplyr distinct
+#' @importFrom dplyr select
 #' @importFrom tidyr drop_na
 #' @examples
 #' gene <- c("MAPK1", "JUN", "FOS", "RAC1", "IL1", "IL6")

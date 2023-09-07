@@ -4,7 +4,7 @@
 \alias{bubble_plot}
 \title{Bubble chart display of KEGG/GO results}
 \usage{
-bubble_plot(data, padjust = 0.01, top = 30, text.size = 4, color = "RdBu", ...)
+bubble_plot(data, padjust = 0.05, top = 20, text.size = 4, color = "RdBu", ...)
 }
 \arguments{
 \item{data}{R clusterprofiler package for KEGG or GO results}
@@ -29,6 +29,7 @@ Bubble chart display of KEGG/GO results
 \examples{
 \dontrun{
 data(xfbdf)
+library(clusterProfiler)
 eg <- bitr(unique(xfbdf$target),
   fromType = "SYMBOL",
   toType = "ENTREZID",

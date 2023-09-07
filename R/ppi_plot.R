@@ -13,35 +13,38 @@
 #' @param edge.width edge width
 #' @param rem.dis.inter remove single free unconnected nodes
 #' @param graph.layout Network Diagram Layout:
-#' "kk", nicely", "grid","sphere", "randomly",
-#' "bipartite", "star","tree", nicely", "grid",
-#' "sphere", "randomly","gem", "graphopt","lgl",
+#' "kk", "nicely", "sphere", "circle",
+#' "bipartite", "star","tree", "randomly",
+#' "gem", "graphopt","lgl", "grid",
 #' "mds", "sugiyama"
 #' @param label.repel label repel
 
-#' @return figure: network diagrams
+#' @return network diagrams
 #' @export
-#' @import dplyr
-#' @import ggplot2
-#' @import ggraph
+#' @importFrom ggplot2 scale_color_gradientn
+#' @importFrom ggplot2 scale_linewidth_continuous
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 scale_fill_manual
+#' @importFrom dplyr distinct
+#' @importFrom dplyr select
+#' @importFrom dplyr mutate
+#' @importFrom dplyr count
+#' @importFrom ggraph ggraph
+#' @importFrom ggraph geom_edge_fan
+#' @importFrom ggraph geom_node_point
+#' @importFrom ggraph geom_node_text
+#' @importFrom ggraph scale_edge_width
+#' @importFrom ggraph theme_graph
 #' @importFrom RColorBrewer brewer.pal
+#' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph V
 #' @importFrom igraph E
-#' @importFrom igraph graph_from_data_frame
+
 #' @examples
 #' \dontrun{
 #' data(string, package = "TCMR")
-#' data <- string %>%
-#'   dplyr::rename(
-#'     from = X.node1,
-#'     to = node2,
-#'     weight = combined_score
-#'   ) %>%
-#'   dplyr::select(from, to, weight) %>%
-#'   dplyr::distinct()
-#'
-#' ppi_plot(data, label.repel = FALSE)
-#' ppi_plot(data,
+#' ppi_plot(string, label.repel = FALSE)
+#' ppi_plot(string,
 #'   label.degree = 1,
 #'   nodes.color = "Spectral",
 #'   label.repel = TRUE
@@ -57,6 +60,17 @@ ppi_plot <- function(data,
                      edge.width = c(0.2, 2),
                      rem.dis.inter = FALSE,
                      graph.layout = "kk") {
+ # data processing
+  if (is.data.frame(data)) {
+    data <- data %>% dplyr::distinct()
+    if (length(unique(data[, 1])) > length(unique(data[, 2]))) {
+      colnames(data) <- c("to", "from", "weight")
+    } else {
+      colnames(data) <- c("from", "to", "weight")
+    }
+  } else {
+    print("The data must be a data frame with three columns.")
+  }
   links <- data
   # node data
   nodes <- links %>%
@@ -66,7 +80,7 @@ ppi_plot <- function(data,
     dplyr::distinct()
 
   # Create a network graph from links and nodes
-  if (rem.dis.inter == FALSE && label.repel == TRUE) {
+  if (rem.dis.inter == FALSE) {
     net <- igraph::graph_from_data_frame(
       d = links,
       vertices = nodes,
@@ -95,18 +109,18 @@ ppi_plot <- function(data,
       ) +
       geom_node_text(aes(filter = degree >= label.degree, label = name),
         size = label.size,
-        repel = TRUE
+        repel = label.repel
       ) +
       ggraph::scale_edge_width(range = edge.width) +
-      scale_size_continuous(name = "degree", range = node.size) +
+      scale_linewidth_continuous(name = "degree", range = node.size) +
       theme_graph(base_family = "sans")
-  } else if (rem.dis.inter == TRUE && label.repel == TRUE) {
+  } else if (rem.dis.inter == TRUE) {
     # remove dissociative interactions
     # If the from of a link in the links data frame
     # only appears once, and the to appears only once, remove it
     links_2 <- links %>%
-      mutate(from_c = count(., from)$n[match(from, count(., from)$from)]) %>%
-      mutate(to_c = count(., to)$n[match(to, count(., to)$to)]) %>%
+      dplyr::mutate(from_c = count(., from)$n[match(from, count(., from)$from)]) %>%
+      dplyr::mutate(to_c = count(., to)$n[match(to, count(., to)$to)]) %>%
       filter(!(from_c == 1 & to_c == 1)) %>%
       dplyr::select(1, 2, 3)
     # new node data
@@ -114,14 +128,14 @@ ppi_plot <- function(data,
       {
         data.frame(gene = c(.$from, .$to))
       } %>%
-      distinct()
-    # Create a network diagram
+      dplyr::distinct()
+    # create a network diagram
     net_2 <- igraph::graph_from_data_frame(
       d = links_2,
       vertices = nodes_2,
       directed = FALSE
     )
-    # Add the necessary parameters
+    # add the necessary parameters
     igraph::V(net_2)$degree <- igraph::degree(net_2)
     igraph::V(net_2)$size <- igraph::degree(net_2)
     igraph::E(net_2)$score <- igraph::E(net_2)$weight
@@ -134,77 +148,10 @@ ppi_plot <- function(data,
         RColorBrewer::brewer.pal(8, nodes.color)
       )) +
       geom_node_text(aes(filter = degree >= label.degree, label = name),
-        size = label.size, repel = TRUE
+        size = label.size, repel = label.repel
       ) +
       ggraph::scale_edge_width(range = edge.width) +
-      scale_size_continuous(name = "degree", range = node.size) +
-      theme_graph(base_family = "sans")
-  } else if (rem.dis.inter == FALSE && label.repel == FALSE) {
-    net <- igraph::graph_from_data_frame(
-      d = links,
-      vertices = nodes,
-      directed = FALSE
-    )
-    igraph::V(net)$degree <- igraph::degree(net)
-    igraph::V(net)$size <- igraph::degree(net)
-    igraph::E(net)$score <- igraph::E(net)$weight
-
-    # Plot with ggraph
-    ggraph(net, layout = graph.layout) +
-      geom_edge_fan(aes(edge_width = score, colour = score),
-        color = edge.color,
-        show.legend = TRUE
-      ) +
-      geom_node_point(aes(color = degree, size = size), alpha = 1.0) +
-      scale_color_gradientn(colours = rev(RColorBrewer::brewer.pal(
-        8, nodes.color
-      ))) +
-      geom_node_text(aes(filter = degree >= label.degree, label = name),
-        size = label.size,
-        repel = FALSE
-      ) +
-      ggraph::scale_edge_width(range = edge.width) +
-      scale_size_continuous(name = "degree", range = node.size) +
-      theme_graph(base_family = "sans")
-  } else if (rem.dis.inter == TRUE && label.repel == FALSE) {
-    # remove dissociative interactions
-    links_2 <- links %>%
-      mutate(from_c = count(., from)$n[match(from, count(., from)$from)]) %>%
-      mutate(to_c = count(., to)$n[match(to, count(., to)$to)]) %>%
-      filter(!(from_c == 1 & to_c == 1)) %>%
-      dplyr::select(1, 2, 3)
-    # new node data
-    nodes_2 <- links_2 %>%
-      {
-        data.frame(gene = c(.$from, .$to))
-      } %>%
-      distinct()
-    # Create a network diagram
-    net_2 <- igraph::graph_from_data_frame(
-      d = links_2,
-      vertices = nodes_2,
-      directed = FALSE
-    )
-    # Add the necessary parameters
-    igraph::V(net_2)$degree <- igraph::degree(net_2)
-    igraph::V(net_2)$size <- igraph::degree(net_2)
-    igraph::E(net_2)$score <- igraph::E(net_2)$weight
-    ggraph(net_2, layout = graph.layout) +
-      geom_edge_fan(aes(edge_width = score, colour = score),
-        color = edge.color,
-        show.legend = TRUE
-      ) +
-      geom_node_point(aes(color = degree, size = size), alpha = 1.0) +
-      scale_color_gradientn(
-        colours =
-          rev(RColorBrewer::brewer.pal(8, nodes.color))
-      ) +
-      geom_node_text(aes(filter = degree >= label.degree, label = name),
-        size = label.size,
-        repel = FALSE
-      ) +
-      ggraph::scale_edge_width(range = edge.width) +
-      scale_size_continuous(name = "degree", range = node.size) +
+      scale_linewidth_continuous(name = "degree", range = node.size) +
       theme_graph(base_family = "sans")
   }
 }

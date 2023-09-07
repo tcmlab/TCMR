@@ -24,8 +24,29 @@
 #' @return bar plot
 #' @export
 #'
-#' @import dplyr
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_bar
+#' @importFrom ggplot2 scale_color_manual
+#' @importFrom ggplot2 scale_fill_manual
+#' @importFrom ggplot2 scale_y_continuous
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_col
+#' @importFrom ggplot2 scale_fill_gradientn
+#' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 labs
+#' @importFrom ggplot2 element_text
+#' @importFrom ggplot2 element_rect
+#' @importFrom ggplot2 scale_y_discrete
+#' @importFrom ggplot2 scale_x_discrete
+#' @importFrom ggplot2 coord_flip
+#' @importFrom ggplot2 expansion
+#' @importFrom ggplot2 facet_grid
+#' @importFrom dplyr mutate
+#' @importFrom dplyr group_by
+#' @importFrom dplyr slice
+#' @importFrom tidyr drop_na
 #' @importFrom stats reorder
 #' @importFrom stringr str_wrap
 #'
@@ -60,9 +81,18 @@ go_barplot <- function(go.diff,
                        text.width = 30,
                        title = "GO enrichment of cluster", ...) {
   # data processing
-  go_enrich <- go.diff@result %>%
+  if (isS4(go.diff)) {
+    go.diff <- go.diff@result
+  } else if (is.data.frame(go.diff)) {
+    go.diff <- go.diff
+  } else {
+    print("The data format must be S4 object or data frame.")
+  }
+
+  go_enrich <- go.diff %>%
+    tidyr::drop_na() %>%
     dplyr::group_by(ONTOLOGY) %>%
-    top_n(n = top, wt = -log10(p.adjust))
+    dplyr::slice(1:top)
   go_enrich <- go_enrich[order(go_enrich$ONTOLOGY,
     go_enrich$p.adjust,
     decreasing = TRUE
@@ -79,11 +109,11 @@ go_barplot <- function(go.diff,
       ) +
       geom_text(
         aes(
-          label = round(-log10(p.adjust), 0),
-          y = round(-log10(p.adjust), 0) + 1.5
+          label = round(-log10(p.adjust), digits = 0),
+          y = round(-log10(p.adjust), digits = 0) + 1.5
         ),
         size = text.size / 3
-      ) + # 添加Count值标注
+      ) +
       coord_flip() +
       labs(x = "", y = "-log10 p.adjust", title = title) +
       labs(fill = "type") +
@@ -111,11 +141,11 @@ go_barplot <- function(go.diff,
       ) +
       geom_text(
         aes(
-          label = round(-log10(p.adjust), 0),
-          y = round(-log10(p.adjust), 0) + 1.5
+          label = round(-log10(p.adjust), digits = 0),
+          y = round(-log10(p.adjust), digits = 0) + 1.5
         ),
         size = text.size / 3
-      ) + # 添加Count值标注
+      ) +
       coord_flip() +
       labs(x = "", y = "-log10 p.adjust", title = title) +
       labs(fill = "type") +
@@ -137,8 +167,8 @@ go_barplot <- function(go.diff,
       geom_col(aes(fill = ONTOLOGY), width = bar.width) +
       geom_text(
         aes(
-          label = round(-log10(p.adjust), 0),
-          y = round(-log10(p.adjust), 0) + 1
+          label = round(-log10(p.adjust), digits = 0),
+          y = round(-log10(p.adjust), digits = 0) + 1
         ),
         size = text.size / 3
       ) +
@@ -174,8 +204,8 @@ go_barplot <- function(go.diff,
       geom_col(aes(fill = ONTOLOGY), width = bar.width) +
       geom_text(
         aes(
-          label = round(-log10(p.adjust), 0),
-          y = round(-log10(p.adjust), 0) + 1
+          label = round(-log10(p.adjust), digits = 0),
+          y = round(-log10(p.adjust), digits = 0) + 1
         ),
         size = text.size / 3
       ) +

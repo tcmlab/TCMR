@@ -15,6 +15,7 @@ go_cir(
   ratio.cex = 0.8,
   p.color = c("#eda9aa", "#c25254"),
   p.cex = 0.8,
+  richFactor.cex = 0.7,
   legend.position = c(0.8, 0.45),
   text.width = 35,
   ...
@@ -52,6 +53,8 @@ colour9 <- c("#A40545", "#7FCBA4", "#4B65AF")}
 \item{p.color}{p adjust color}
 
 \item{p.cex}{The text size of padjust}
+
+\item{richFactor.cex}{The text size of richFactor}
 
 \item{legend.position}{legend position}
 
