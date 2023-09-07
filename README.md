@@ -1,7 +1,7 @@
 ---
 title: "TCMR"
 author: Jinkun Liu, Qin wang, Bin Wu, Min Ying
-time: 2023-9-10
+time: 2023-9-07
 ---
 # TCMR <img src= https://github.com/tcmlab/image/blob/main/LOGO2-15.png align="right" height="200" />
 
