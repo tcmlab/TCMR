@@ -25,7 +25,7 @@ if(!require(TCMR))devtools::install_github("tcmlab/TCMR",upgrade = FALSE,depende
 Click the green button "code" on this page, then click "Download ZIP" to download it to your working directory. Install it with 
 
 ```{r}
-devtools::install_local("TCMR-master.zip", upgrade = F, dependencies = T)                                               
+devtools::install_local("TCMR-main.zip", upgrade = F, dependencies = T)                                               
 ```
 
 ## functions
