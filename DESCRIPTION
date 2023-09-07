@@ -1,0 +1,57 @@
+Package: TCMR
+Title: Traditional Chinese Medicine Network Pharmacology
+Version: 1.0.0
+Authors@R: 
+    person(given = "Jinkun",
+           family = "Liu",
+           role = c("aut", "cre"),
+           email = "liujinku007@163.com",
+           comment = c(ORCID = "0000-0003-2212-9617"))
+Description: A visualization tool for network pharmacology data analysis.
+License: GPL-3 
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    aplot,
+    ggtree,
+    grDevices,
+    igraph,
+    magrittr,
+    RColorBrewer,
+    rlang,
+    stats,
+    tidyr,
+    ComplexHeatmap,
+    cols4all,
+    cowplot,
+    ggrepel,
+    ggsankey,
+    stringr,
+    UpSetR,
+    ggvenn,
+    venn,
+    ccgraph (>= 0.1.0),
+    tidygraph
+Depends: 
+    circlize,
+    dplyr,
+    ggplot2,
+    ggraph,
+    R (>= 2.10)
+LazyData: true
+Suggests: 
+    clusterProfiler,
+    DOSE,
+    knitr,
+    org.Hs.eg.db,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    tidyverse,
+    utils
+Config/testthat/edition: 3
+VignetteBuilder: knitr
+Remotes: 
+    github::gaospecial/ccgraph
+    bioc::ComplexHeatmap
+    bioc::ggtree
