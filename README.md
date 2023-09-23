@@ -143,19 +143,60 @@ newdata <- tcm_prescription(disease_gene)
 library(formattable)
 formattable(newdata[[1]])
 ```
+<img src= https://github.com/tcmlab/image/blob/main/%E8%8D%AF%E7%89%A9%E7%AD%9B%E9%80%89.png height="400" />
 
 ```{r}
 formattable(newdata[[2]], list(
   Count = color_bar("lightblue")
   ))
 ```
-
+<img src= https://github.com/tcmlab/image/blob/main/%E5%A4%84%E6%96%B9%E8%A1%A8%E6%A0%BC.png height="400" />
 
 ```{r}
-formattable(newdata[[2]], list(
-  Count = color_bar("lightblue")
-  ))
+#### draw plot
+data2 <- newdata[[2]] %>%
+  arrange(desc(Count)) %>%
+  slice(1:20)
+
+pacman::p_load(showtext)
+showtext_auto()
+
+data2$CompoundId <- factor(data2$CompoundId, levels = rev(data2$CompoundId))
+font.size <- 8
+ggplot(data2, aes(x = CompoundId, y = Count, fill = Pvalue)) +
+  ## 画出bar图
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme(text = element_text(family = "Kai")) +
+  ## 调整颜色，guide_colorbar调整色图的方向
+  scale_fill_gradientn(
+    colours = RColorBrewer::brewer.pal(8, "RdBu"),
+    trans = "log10",
+    guide = guide_colorbar(reverse = TRUE, order = 1)
+  ) +
+  ## 如果用ylab("")或出现左侧空白
+  labs(x = NULL) +
+  theme_bw() +
+  ## 如果没有这一句，上方会到顶
+  ggtitle("") +
+  ## 设定主题
+  theme(
+    axis.text.x = element_text(
+      colour = "black",
+      size = font.size, vjust = 1
+    ),
+    axis.text.y = element_text(
+      colour = "black",
+      size = font.size, hjust = 1
+    ),
+    axis.title = element_text(
+      margin = margin(10, 5, 0, 0),
+      color = "black", size = font.size
+    ),
+    axis.title.y = element_text(angle = 90)
+  )
 ```
+<img src= https://github.com/tcmlab/image/blob/main/%E7%AD%9B%E9%80%89%E5%90%8E%E7%9A%84%E5%A4%84%E6%96%B9.png height="400" />
 
 ## 4. tcm_net
 
