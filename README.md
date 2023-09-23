@@ -133,19 +133,21 @@ ai di cha   MOL000098       quercetin    IL6
 ## 4.tcm_prescription 
 
 ```{r}
-head(newdata[[1]])
+#通过疾病靶点基因寻找中药及其处方
 data(disease_gene, package = "TCMR")
 newdata <- tcm_prescription(disease_gene)
 ```
 
 
 ```{r}
+#寻找到的中药
 library(formattable)
 formattable(newdata[[1]])
 ```
 <img src= https://github.com/tcmlab/image/blob/main/%E8%8D%AF%E7%89%A9%E7%AD%9B%E9%80%89.png height="400" />
 
 ```{r}
+#寻找到的处方
 formattable(newdata[[2]], list(
   Count = color_bar("lightblue")
   ))
@@ -153,7 +155,7 @@ formattable(newdata[[2]], list(
 <img src= https://github.com/tcmlab/image/blob/main/%E5%A4%84%E6%96%B9%E8%A1%A8%E6%A0%BC.png height="400" />
 
 ```{r}
-#### draw plot
+# draw plot
 data2 <- newdata[[2]] %>%
   arrange(desc(Count)) %>%
   slice(1:20)
@@ -198,7 +200,7 @@ ggplot(data2, aes(x = CompoundId, y = Count, fill = Pvalue)) +
 ```
 <img src= https://github.com/tcmlab/image/blob/main/%E7%AD%9B%E9%80%89%E5%90%8E%E7%9A%84%E5%A4%84%E6%96%B9.png height="400" />
 
-## 4. tcm_net
+## 5. tcm_net
 
 ```{r}
 data("xfbdf", package = "TCMR")
@@ -213,7 +215,7 @@ tcm_net(network.data,
 
 <img src= https://github.com/tcmlab/image/blob/main/tcm_net.png height="400" />
 
-## 5. degree_plot
+## 6. degree_plot
 
 ```{r}
 degree_plot(xfbdf,plot.set='horizontal')
@@ -221,7 +223,7 @@ degree_plot(xfbdf,plot.set='horizontal')
 
 <img src= https://github.com/tcmlab/image/blob/main/degree_plot2.png height="400" />
 
-## 6. tcm_sankey
+## 7. tcm_sankey
 
 ```{r}
 sankey.data <- xfbdf[sample(nrow(xfbdf), 30), ]
@@ -233,7 +235,7 @@ sankey.data <- xfbdf[sample(nrow(xfbdf), 30), ]
 
 <img src= https://github.com/tcmlab/image/blob/main/tcm_sankey.png height="400" />
 
-## 7. tcm_alluvial
+## 8. tcm_alluvial
 
 ```{r}
 alluvial.data <- xfbdf[sample(nrow(xfbdf), 30), ]
@@ -246,7 +248,7 @@ alluvial.data <- xfbdf[sample(nrow(xfbdf), 30), ]
 
 <img src= https://github.com/tcmlab/image/blob/main/tcm_alluvial.png height="400" />
 
-## 8. bar_plot
+## 9. bar_plot
 
 ```{r}
 data(xfbdf, package = "TCMR")
@@ -275,7 +277,7 @@ bar_plot(BP,title = "biological process")
 
 <img src= https://github.com/tcmlab/image/blob/main/barplot_bp.png height="400" />
 
-## 9. dot_plot
+## 10. dot_plot
 
 ```{r}
 dot_plot(KK, title = "KEGG")
@@ -283,7 +285,7 @@ dot_plot(KK, title = "KEGG")
 
 <img src= https://github.com/tcmlab/image/blob/main/dot_plot_KK.png height="400" />
 
-## 10. lollipop_plot
+## 11. lollipop_plot
 
 ```{r}
 lollipop_plot(KK, title = "KEGG")
@@ -291,7 +293,7 @@ lollipop_plot(KK, title = "KEGG")
 
 <img src= https://github.com/tcmlab/image/blob/main/lollipop_plot_KK.png height="400" />
 
-## 11. cir_plot
+## 12. cir_plot
 
 ```{r}
 cir_plot(KK)
@@ -301,7 +303,7 @@ cir_plot(KK)
 
 
 
-## 12. pathway_cirplot
+## 13. pathway_cirplot
 
 ```{r}
 #Filter the pathways to display
@@ -313,7 +315,7 @@ pathway_cirplot(newdata)
 <img src= https://github.com/tcmlab/image/blob/main/pathway_cirplot.png height="400" />
 
 
-## 13. pathway_ccplot
+## 14. pathway_ccplot
 
 ```{r}
 pathway_ccplot(KK, root = "KEGG")
@@ -321,7 +323,7 @@ pathway_ccplot(KK, root = "KEGG")
 
 <img src= https://github.com/tcmlab/image/blob/main/pathway_ccplot.png height="400" />
 
-## 14. bubble_plot
+## 15. bubble_plot
 
 ```{r}
 bubble_plot(KK)
@@ -329,7 +331,7 @@ bubble_plot(KK)
 
 <img src= https://github.com/tcmlab/image/blob/main/bubble_plot.png height="400" />
 
-## 15. dot_sankey
+## 16. dot_sankey
 
 ```{r}
 dot_sankey(newdata, dot.x = 0.35, dot.y = 0.25)
@@ -347,7 +349,7 @@ dot_sankey(kegg.filter)
 
 <img src= https://github.com/tcmlab/image/blob/main/dot_sankey2.png height="400" />
 
-## 16. go_barplot
+## 17. go_barplot
 
 ```{r}
 eg <- bitr(unique(xfbdf$target), fromType = "SYMBOL", toType = "ENTREZID", OrgDb = "org.Hs.eg.db")
@@ -365,7 +367,7 @@ go_barplot(go.diff)
 
 <img src= https://github.com/tcmlab/image/blob/main/go_barplot(go.diff).png height="400" />
 
-## 17. go_dotplot
+## 18. go_dotplot
 
 ```{r}
 go_dotplot(go.diff)
@@ -373,14 +375,14 @@ go_dotplot(go.diff)
 
 <img src= https://github.com/tcmlab/image/blob/main/go_dotplot(go.diff).png height="400" />
 
-## 18. go_lollipop
+## 19. go_lollipop
 
 ```{r}
 go_lollipop(go.diff)
 ```
 <img src= https://github.com/tcmlab/image/blob/main/go_lollipop(go.diff).png height="400" />
 
-## 19. go_cir
+## 20. go_cir
 
 ```{r}
 go_cir(go.diff)
@@ -388,7 +390,7 @@ go_cir(go.diff)
 
 <img src= https://github.com/tcmlab/image/blob/main/go_cir(go.diff).png height="400" />
 
-## 20.  tcm_sankey_dot
+## 21.  tcm_sankey_dot
 
 ```{r}
  KK2 <- KK %>% mutate(richFactor = Count / as.numeric(sub("/\\d+", "", BgRatio)))
@@ -414,7 +416,7 @@ tcm_sankey(data_sankey2,text.position = 1)
 
 <img src= https://github.com/tcmlab/image/blob/main/tcm_sankey2.png height="400" />
 
-## 21. tcm_alluvial_dot
+## 22. tcm_alluvial_dot
 
 ```{r}
 tcm_alluvial_dot(data_sankey)
@@ -428,7 +430,7 @@ tcm_alluvial(data_sankey2, text.position = 1)
 
 <img src= https://github.com/tcmlab/image/blob/main/tcm_alluvial2.png height="400" />
 
-## 22. ppi_plot
+## 23. ppi_plot
 
 ```{r}
 data(string, package = "TCMR")
@@ -451,7 +453,7 @@ ppi_plot(string,
 
 <img src= https://github.com/tcmlab/image/blob/main/ppi_plot3.png height="400" />
 
-## 23. dock_plot
+## 24. dock_plot
 
 ```{r}
 data <- matrix(rnorm(81), 9, 9)
@@ -470,7 +472,7 @@ dock_plot(data, shape = "circle", legend.height = 3)
 
 <img src= https://github.com/tcmlab/image/blob/main/dock_plot2.png height="400" />
 
-## 24. venn_plot
+## 25. venn_plot
 
 ```{r}
 data(venn.data, package = "TCMR")
@@ -485,7 +487,7 @@ venn_plot(venn.data, type = 2)
 
 <img src= https://github.com/tcmlab/image/blob/main/venn_plot(venn%2C%20type%3D3).png height="400" />
 
-## 25. venn_net
+## 26. venn_net
 
 ```{r}
 data(venn.data, package = "TCMR")
@@ -507,7 +509,7 @@ venn_net(data2, edge.type = "hive", label.degree = 4)
 ```
 <img src= https://github.com/tcmlab/image/blob/main/venn_net4-2.png height="400" />
 
-## 26. tf_filter
+## 27. tf_filter
 
 ```{r}
 # Finding transcription factors and their target genes
@@ -525,7 +527,7 @@ head(newdata)
   AHR  CCND1            Unknown         24380854   Human   TRRUST
 ```
 
-## 27. tf_cirplot
+## 28. tf_cirplot
 
 ```{r}
 # Visualization of filtered transcription factor data
@@ -539,7 +541,7 @@ tf_cirplot(data, color = "Spectral")
 ```
 <img src = https://github.com/tcmlab/image/blob/main/tf_cirplot_2.png height="400" />
 
-## 28. etcm
+## 29. etcm
 
 ```{r}
 data("mahuang", package = "TCMR")
