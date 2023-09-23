@@ -166,22 +166,17 @@ showtext_auto()
 data2$CompoundId <- factor(data2$CompoundId, levels = rev(data2$CompoundId))
 font.size <- 8
 ggplot(data2, aes(x = CompoundId, y = Count, fill = Pvalue)) +
-  ## 画出bar图
   geom_bar(stat = "identity") +
   coord_flip() +
   theme(text = element_text(family = "Kai")) +
-  ## 调整颜色，guide_colorbar调整色图的方向
   scale_fill_gradientn(
     colours = RColorBrewer::brewer.pal(8, "RdBu"),
     trans = "log10",
     guide = guide_colorbar(reverse = TRUE, order = 1)
   ) +
-  ## 如果用ylab("")或出现左侧空白
   labs(x = NULL) +
   theme_bw() +
-  ## 如果没有这一句，上方会到顶
   ggtitle("") +
-  ## 设定主题
   theme(
     axis.text.x = element_text(
       colour = "black",
