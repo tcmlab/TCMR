@@ -47,7 +47,7 @@ circle chart showed the results of GO and KEGG analysis
 \examples{
 \dontrun{
 data("KK", package = "TCMR")
-library(ggraph)
+library(dplyr)
 pathway_ccplot(KK, root = "KEGG")
 }
 

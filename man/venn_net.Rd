@@ -55,7 +55,7 @@ venn.color9 <- c("#d37a20", "#dbcb09", "#3a9cbc", "#dd7208", "#a30019")}
 "kk", "nicely", "sphere", "circle",
 "bipartite", "star","tree", "randomly",
 "gem", "graphopt","lgl", "grid",
-"mds", "sugiyama"}
+"mds", "sugiyama","fr"}
 }
 \value{
 venn network diagrams
@@ -71,7 +71,7 @@ gene <- names(sort(table(venn.data$gene), decreasing = TRUE))[1:50]
 data <- venn.data[venn.data$gene \%in\% gene, ]
 data2 <- dplyr::sample_n(venn.data, 100) \%>\%
   rbind(data)
-venn_net(data2, label.degree = 1)
+venn_net(data2, label.degree = 1,graph.layout = "fr")
 venn_net(data2, edge.type = "hive", label.degree = 4)
 }
 }

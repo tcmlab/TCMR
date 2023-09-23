@@ -43,7 +43,7 @@ equal to degree will be displayed.}
 "kk", "nicely", "circle", "sphere",
 "bipartite", "star", "tree", "randomly",
 "gem", "graphopt","lgl", "grid",
-"mds", "sugiyama"}
+"mds", "sugiyama","fr"}
 
 \item{rem.dis.inter}{remove single free unconnected nodes}
 }
@@ -61,7 +61,7 @@ network.data <- xfbdf \%>\%
   sample_n(100, replace = FALSE) \%>\%
   as.data.frame()
 tcm_net(network.data, node.color= "Spectral",
-label.degree = 1, rem.dis.inter = TRUE,graph.layout = "grid",
+label.degree = 1, rem.dis.inter = TRUE,graph.layout = "fr",
 label.size = 3)
 }
 }
