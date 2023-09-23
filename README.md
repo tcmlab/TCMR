@@ -113,8 +113,6 @@ ku xing ren   MOL010921  estrone  CHRM1
 ku xing ren   MOL010921  estrone  CHRM5
 ```
 
-
-
 ## 3. target_herb
 
 ```{r}
@@ -132,8 +130,32 @@ ai di cha   MOL000098       quercetin    JUN
 ai di cha   MOL000098       quercetin    IL6
     ai ye   MOL000358 beta-sitosterol    JUN
 ```
+## 4.tcm_prescription 
+
+```{r}
+head(newdata[[1]])
+data(disease_gene, package = "TCMR")
+newdata <- tcm_prescription(disease_gene)
+```
 
 
+```{r}
+library(formattable)
+formattable(newdata[[1]])
+```
+
+```{r}
+formattable(newdata[[2]], list(
+  Count = color_bar("lightblue")
+  ))
+```
+
+
+```{r}
+formattable(newdata[[2]], list(
+  Count = color_bar("lightblue")
+  ))
+```
 
 ## 4. tcm_net
 
