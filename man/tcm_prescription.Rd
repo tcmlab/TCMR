@@ -15,7 +15,7 @@ tcm_prescription(
 )
 }
 \arguments{
-\item{disease.gene}{disease gene}
+\item{disease.gene}{disease gene as character}
 
 \item{compound.source}{"tcmp", "cmp"}
 
@@ -41,9 +41,9 @@ Find Chinese medicine prescriptions through disease targets
 }
 \examples{
 \dontrun{
-data(disease_gene, package = "TCMR")
-newdata <- tcm_prescription(disease_gene)
-newdata[[1]]
-newdata[[2]]
+data(COVID19_gene, package = "TCMR")
+newdata <- tcm_prescription(COVID19_gene)
+head(newdata[[1]])
+head(newdata[[2]])
 }
 }
