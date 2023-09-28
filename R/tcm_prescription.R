@@ -1,6 +1,6 @@
 #' Find Chinese medicine prescriptions through disease targets
 #'
-#' @param disease.gene disease gene
+#' @param disease.gene disease gene as character
 #' @param compound.source "tcmp", "cmp"
 #' @param OB.value bioavailability
 #' @param DL.value drug-likeness
@@ -19,15 +19,18 @@
 #' @importFrom dplyr arrange
 #' @importFrom dplyr select
 #' @importFrom dplyr n
+#' @importFrom dplyr left_join
 #' @importFrom dplyr row_number
+#' @importFrom dplyr rename
 #' @importFrom tidyr drop_na
+#' @importFrom tidyr everything
 #' @importFrom stats phyper
 #' @examples
 #' \dontrun{
-#' data(disease_gene, package = "TCMR")
-#' newdata <- tcm_prescription(disease_gene)
-#' newdata[[1]]
-#' newdata[[2]]
+#' data(COVID19_gene, package = "TCMR")
+#' newdata <- tcm_prescription(COVID19_gene)
+#' head(newdata[[1]])
+#' head(newdata[[2]])
 #' }
 tcm_prescription <- function(disease.gene,
                              compound.source = "tcmp",
@@ -43,12 +46,15 @@ tcm_prescription <- function(disease.gene,
 
   # Count the frequency of occurrence of herbs
   herb_frq <- tcmsp2 %>%
-    dplyr::select(Herb_cn_name) %>%
+    dplyr::select(Herb_cn_name, Herb_name_pin_yin) %>%
     dplyr::group_by(Herb_cn_name) %>%
     dplyr::mutate(freq = dplyr::n()) %>%
     arrange(desc(freq)) %>%
     dplyr::distinct() %>%
-    dplyr::filter(freq > freq.value)
+    dplyr::filter(freq > freq.value) %>%
+    as.data.frame() %>%
+    dplyr::rename(Herb_pinyin = Herb_name_pin_yin) %>%
+    dplyr::rename(Herb = Herb_cn_name)
 
   # Construct a data set of traditional Chinese medicine prescriptions
   tmp <- compoundfinal %>%
@@ -72,7 +78,7 @@ tcm_prescription <- function(disease.gene,
   # The number of herbs in k that fall into a specific compound (a)
   herb_compound <- tapply(tmp[, 2], as.factor(tmp[, 1]), function(x) x)
   compound_herb <- tapply(tmp[, 1], as.factor(tmp[, 2]), function(x) x)
-  herb_name <- herb_frq$Herb_cn_name
+  herb_name <- herb_frq$Herb
   herb_name_has_compound <- intersect(herb_name, names(herb_compound))
   n <- length(herb_name)
   universeherb <- unique(tcmsp$Herb_cn_name)
@@ -89,11 +95,11 @@ tcm_prescription <- function(disease.gene,
     }
     Oddratio <- k / exp_count
     if (k == 0) next
-    p <- phyper(k - 1, M, N - M, n, lower.tail = F)
+    p <- phyper(k - 1, M, N - M, n, lower.tail = FALSE)
     results <- rbind(results, c(i, p, Oddratio, exp_count, k, M))
   }
-  colnames(results) <- c("CompoundId", "Pvalue", "OddsRatio", "ExpCount", "Count", "Size")
-  results <- as.data.frame(results, stringsAsFactors = F)
+  colnames(results) <- c("Compound", "Pvalue", "OddsRatio", "ExpCount", "Count", "Size")
+  results <- as.data.frame(results, stringsAsFactors = FALSE)
   results$p.adjust <- stats::p.adjust(results$Pvalue, method = "BH") %>%
     base::format(digits = digits.value, nsmall = digits.value) %>%
     as.numeric()
@@ -113,9 +119,19 @@ tcm_prescription <- function(disease.gene,
   # Add the intersection of compound herbal medicine and background herbal medicine
   herb_list <- list()
   for (i in seq(dplyr::row_number(results))) {
-    herb_list[[i]] <- intersect(tmp[tmp$compound %in% results$CompoundId[i], ]$herb, herb_name) %>%
+    herb_list[[i]] <- intersect(tmp[tmp$compound %in% results$Compound[i], ]$herb, herb_name) %>%
       paste0(sep = "", collapse = "/")
   }
   results$herb <- unlist(herb_list)
+  compoundfinal2 <- compoundfinal[, c(1, 2)]
+  results <- left_join(results, compoundfinal2,
+    by = c("Compound" = "compound")
+  ) %>%
+    dplyr::select(
+      Compound, compound_pinyin,
+      tidyr::everything()
+    ) %>%
+    dplyr::distinct() %>%
+    dplyr::rename(Compound_pinyin = compound_pinyin)
   return(list(herb_frq, results))
 }

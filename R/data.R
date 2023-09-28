@@ -86,3 +86,43 @@
 #' @examples
 #' head(herb_pm)
 "herb_pm"
+
+#' kegg
+#'
+#' The results of KEGG pathways and genes
+#' A data frame with 43304 rows and 5 variables
+#' @source  KEGG database
+#' @examples
+#' head(kegg)
+#'
+"kegg"
+
+#' gsea
+#'
+#' The results of GSEA pathways and genes
+#' A data frame with 7321rows and 2 variables
+#' @source  GSEA database
+#' @examples
+#' head(gsea)
+#'
+"gsea"
+
+#' compoundfinal
+#'
+#' Chinese medicine prescription(tcmp) and Chinese patent medicine(cpm)
+#' A data frame with 7321rows and 2 variables
+#' @source  compound database
+#' @examples
+#' head(compoundfinal)
+#'
+"compoundfinal"
+
+
+#' COVID19_gene
+#'
+#' A character with 790 genes
+#' @source  KEGG & GSEA
+#' @examples
+#' head(COVID19_gene)
+#'
+"COVID19_gene"

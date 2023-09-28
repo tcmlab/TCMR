@@ -110,6 +110,15 @@ if (getRversion() >= "2.15.1") {
     "meridian.label2",
     "meridian.label3",
     "flavor.label1",
-    "flavor.label2"
+    "flavor.label2",
+    "freq",
+    "compoundfinal",
+    "compound",
+    "row_number",
+    "phyper",
+    "Compound",
+    "Compound_pinyin",
+    "compound_pinyin",
+    "Herb_pinyin"
   ))
 }
