@@ -17,7 +17,7 @@
 "xfbdf"
 
 
-#' string
+#' ppi_data
 #'
 #' Protein-protein interaction analysis was performed using STRING database.
 #' A data frame with 2234 rows and 3 variables
