@@ -35,9 +35,13 @@
 #' @export
 #'
 #' @examples
+#'  \dontrun{
 #' library(UpSetR)
-#' data(venn.data, package = "TCMR")
-#' venn_plot(venn.data, type = 1)
+#' data(venn_data, package = "TCMR")
+#' venn_plot(venn_data, type =1)
+#' venn_plot(venn_data, type =2)
+#' }
+#'
 venn_plot <- function(data,
                       set.color = c(
                         "#FF8748", "#5BAA56", "#4186B7",
@@ -49,6 +53,7 @@ venn_plot <- function(data,
                       type = 1,
                       vratio = c(0.65, 0.35), ...) {
   # data processing
+  data <- as.data.frame(data)
   if (is.data.frame(data)) {
     data <- data %>% dplyr::distinct()
     if (is.data.frame(data)) {
@@ -84,7 +89,7 @@ venn_plot <- function(data,
         fill_color = color_set,
         set_name_color = color_set
       )+
-      scale_x_continuous(expand = expansion(mult = 0.2))
+        scale_x_continuous(expand = expansion(mult = 0.2))
     } else if (type == 2) {
       # draw a third Venn diagram
       data2 <- data %>%
@@ -117,20 +122,20 @@ venn_plot <- function(data,
         )
       }
       UpSetR::upset(data2,
-        nsets = ncol(tmp2),
-        text.scale = text.size/4,
-        # number of datasets
-        mb.ratio = vratio,
-        # the ratio of the histogram to the size of the matrix
-        sets.bar.color = venn.color,
-        # modify the color of the left bar
-        order.by = "freq",
-        # column sorting
-        decreasing = TRUE,
-        queries = query_list2,
-        # modify the color of the bars and the color of the matrix scatter
-        shade.color = NA
-        # shadow color of rectangular scatter points
+                    nsets = ncol(tmp2),
+                    text.scale = text.size/4,
+                    # number of datasets
+                    mb.ratio = vratio,
+                    # the ratio of the histogram to the size of the matrix
+                    #sets.bar.color = venn.color,
+                    # modify the color of the left bar
+                    order.by = "freq",
+                    # column sorting
+                    decreasing = TRUE,
+                    queries = query_list2,
+                    # modify the color of the bars and the color of the matrix scatter
+                    shade.color = NA
+                    # shadow color of rectangular scatter points
       )
     }
   }

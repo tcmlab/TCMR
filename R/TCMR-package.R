@@ -117,8 +117,9 @@ if (getRversion() >= "2.15.1") {
     "row_number",
     "phyper",
     "Compound",
-    "Compound_pinyin",
+    "CompoundId",
+    "Pvalue",
     "compound_pinyin",
-    "Herb_pinyin"
+    "compound_cn"
   ))
 }

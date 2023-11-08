@@ -2,7 +2,7 @@
 #'
 #' @param data Human protein-protein interaction (PPI)
 #' data were downloaded from the STRING database.
-#' @param nodes.color  node color: see "RColorBrewer::display.brewer.all()"
+#' @param node.color  node color: see "RColorBrewer::display.brewer.all()"
 #' @param node.size  node size
 #' @param label.size markup text size
 #' @param label.degree The node degree is the number of connections that
@@ -42,16 +42,12 @@
 
 #' @examples
 #' \dontrun{
-#' data(string, package = "TCMR")
-#' ppi_plot(string, label.repel = FALSE)
-#' ppi_plot(string,
-#'   label.degree = 1,
-#'   nodes.color = "Spectral",
-#'   label.repel = TRUE
-#' )
+#' data(ppi_data, package = "TCMR")
+#' ppi_plot(ppi_data, label.repel = FALSE)
+
 #' }
 ppi_plot <- function(data,
-                     nodes.color = "RdBu",
+                     node.color = "RdBu",
                      node.size = c(1, 10),
                      label.size = 4,
                      label.degree = 5,
@@ -105,7 +101,7 @@ ppi_plot <- function(data,
       geom_node_point(aes(color = degree, size = size), alpha = 1.0) +
       scale_color_gradientn(
         colours =
-          rev(RColorBrewer::brewer.pal(8, nodes.color))
+          rev(RColorBrewer::brewer.pal(8, node.color))
       ) +
       geom_node_text(aes(filter = degree >= label.degree, label = name),
         size = label.size,
@@ -145,7 +141,7 @@ ppi_plot <- function(data,
       ) +
       geom_node_point(aes(color = degree, size = size), alpha = 1.0) +
       scale_color_gradientn(colours = rev(
-        RColorBrewer::brewer.pal(8, nodes.color)
+        RColorBrewer::brewer.pal(8, node.color)
       )) +
       geom_node_text(aes(filter = degree >= label.degree, label = name),
         size = label.size, repel = label.repel

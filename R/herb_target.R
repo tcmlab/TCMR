@@ -20,7 +20,7 @@
 herb_target <- function(herb,
                         OB.value = 30,
                         DL.value = 0.18,
-                        type = "Herb_name_pin_yin",
+                        type = "Herb_cn_name",
                         ...) {
   if (type == "Herb_cn_name") {
     if (all(herb %in% (unique(tcmsp$Herb_cn_name))) == FALSE) {

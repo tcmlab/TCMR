@@ -35,7 +35,7 @@ tcm_alluvial <- function(data,
                          axis.text.x.size = 12,
                          ...) {
   # color settings
-  df <- data %>% make_long(colnames(data))
+  df <- data %>% as.data.frame()%>% make_long(colnames(data))
   mycol <- cols4all::c4a("rainbow_wh_rd", length(unique(df$node)))
   mycol2 <- sample(mycol, length(mycol), replace = FALSE)
   # alluvial diagram

@@ -68,6 +68,7 @@ tcm_net <- function(network.data,
                     edge.width = c(0.2, 2),
                     graph.layout = "kk",
                     rem.dis.inter = FALSE) {
+  network.data<-as.data.frame(network.data)
   links <- rbind(
     network.data %>%
       dplyr::select(herb, molecule) %>%

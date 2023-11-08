@@ -23,10 +23,10 @@
 #' A data frame with 2234 rows and 3 variables
 #' @source \url{https://string-db.org/}
 #' @examples
-#' string.data <- data(string)
-#' head(string.data)
+#' ppi_data<- data(ppi_data)
+#' head(ppi_data)
 #'
-"string"
+"ppi_data"
 
 #' ma huang
 #'
@@ -64,19 +64,16 @@
 #' A data frame with 6439 rows and 2 variables
 #' @source \url{https://www.nature.com/articles/s41556-021-00796-6#Sec47}
 #' @examples
-#' head(venn.data)
-"venn.data"
+#' head(venn_data)
+"venn_data"
 
-#' TRRUST database
-#' @description TRRUST contains 8,444 and 6,552 TF-target regulatory
-#' relationships of 800 human TFs and 828 mouse TFs, respectively.
-#'
-#' The datasets was from TRRUST database
-#' A data frame with 16543 rows and 6 variables
+#' tf_data
+#' @description The datasets was from TRRUST database
+#' A data frame with 100 rows and 2 variables
 #' @source \url{https://www.grnpedia.org/trrust/}
 #' @examples
-#' head(trrust)
-"trrust"
+#' head(tf_data)
+"tf_data"
 
 #' Herbal Properties and Meridians
 #' @description Chinese Pharmacopoeia commonly used herbs property and flavor, tropism
@@ -87,42 +84,91 @@
 #' head(herb_pm)
 "herb_pm"
 
-#' kegg
+#' network_data
 #'
-#' The results of KEGG pathways and genes
-#' A data frame with 43304 rows and 5 variables
-#' @source  KEGG database
+#'
+#' A data frame with 100rows and 3 variables
+#' @source  network_data
 #' @examples
-#' head(kegg)
+#' head(network_data)
 #'
-"kegg"
+"network_data"
 
-#' gsea
+
+#' disease_data
 #'
-#' The results of GSEA pathways and genes
-#' A data frame with 7321rows and 2 variables
-#' @source  GSEA database
+#' A character with 790 genes
+#' @source  KEGG & GSEA
 #' @examples
-#' head(gsea)
+#' head(disease_data)
 #'
-"gsea"
+"disease_data"
+
+#' sankey_data
+#'
+#' A data frame with 100 rows and 4 variables
+#' @source  xfbdf
+#' @examples
+#' head(sankey_data)
+#'
+"sankey_data"
 
 #' compoundfinal
 #'
-#' Chinese medicine prescription(tcmp) and Chinese patent medicine(cpm)
-#' A data frame with 7321rows and 2 variables
-#' @source  compound database
+#' A data frame with 3397rows and 5 variables
 #' @examples
 #' head(compoundfinal)
 #'
 "compoundfinal"
 
-
-#' COVID19_gene
+#' trrust
 #'
-#' A character with 790 genes
-#' @source  KEGG & GSEA
+#' A data frame with 7189 rows and 2 variables
 #' @examples
-#' head(COVID19_gene)
+#' head(trrust)
 #'
-"COVID19_gene"
+"trrust"
+
+#' human_kegg
+#'
+#' A data frame with 36788 rows and 2 variables
+#' @examples
+#' head(human_kegg)
+#'
+"human_kegg"
+
+#' human_gsea
+#'
+#' A data frame with 7189 rows and 2 variables
+#' @examples
+#' head(human_gsea)
+#'
+"human_gsea"
+
+
+#' mu_kegg
+#'
+#' A data frame with 36788 rows and 2 variables
+#' @examples
+#' head(compound_data)
+#'
+"mu_kegg"
+
+#' mu_gsea
+#'
+#' A data frame with 7189 rows and 2 variables
+#' @examples
+#' head(mu_gsea)
+#'
+"mu_gsea"
+
+
+#' compound_data
+#'
+#' A data frame with 13 rows and 5 variables
+#' @examples
+#' head(compound_data)
+#'
+"compound_data"
+
+

@@ -28,13 +28,16 @@
 #' data("xfbdf", package = "TCMR")
 #' data <- xfbdf %>% dplyr::sample_n(30, replace = FALSE)
 #' tcm_sankey(data, text.position = 1)
+
 tcm_sankey <- function(data_sankey,
                        text.size = 3,
                        text.position = 0,
                        x.axis.text.size = 12,
-                       ...) {
+                       ...){
   # color settings
-  df <- data_sankey %>% make_long(colnames(data_sankey))
+  df <- data_sankey %>% 
+        as.data.frame()%>%
+        make_long(colnames(data_sankey))
   mycol <- cols4all::c4a("rainbow_wh_rd", length(unique(df$node)))
   mycol2 <- sample(mycol, length(mycol), replace = FALSE)
   # Sankey diagram

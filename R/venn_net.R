@@ -1,7 +1,7 @@
 #' venn network
 #'
 #' @param data data frame
-#' @param nodes.color  node color: see "RColorBrewer::display.brewer.all()"
+#' @param node.color  node color: see "RColorBrewer::display.brewer.all()"
 #' @param node.size  node size
 #' @param label.size markup text size
 #' @param label.degree The node degree is the number of connections that
@@ -49,17 +49,17 @@
 #' @importFrom igraph E
 #' @examples
 #' \dontrun{
-#' data(venn.data, package = "TCMR")
+#' data(venn_data, package = "TCMR")
 #' set.seed(1234)
-#' gene <- names(sort(table(venn.data$gene), decreasing = TRUE))[1:50]
-#' data <- venn.data[venn.data$gene %in% gene, ]
-#' data2 <- dplyr::sample_n(venn.data, 100) %>%
+#' gene <- names(sort(table(venn_data$gene), decreasing = TRUE))[1:50]
+#' data <- venn_data[venn.data$gene %in% gene, ]
+#' data2 <- dplyr::sample_n(venn_data, 100) %>%
 #'   rbind(data)
 #' venn_net(data2, label.degree = 1,graph.layout = "fr")
 #' venn_net(data2, edge.type = "hive", label.degree = 4)
 #' }
 venn_net <- function(data,
-                     nodes.color = "Spectral",
+                     node.color = "Spectral",
                      node.size = c(1, 10),
                      label.size = 3,
                      label.degree = 1,
@@ -111,7 +111,7 @@ venn_net <- function(data,
       geom_node_point(aes(color = degree, size = size), alpha = 1.0) +
       scale_color_gradientn(
         colours =
-          rev(RColorBrewer::brewer.pal(8, nodes.color))
+          rev(RColorBrewer::brewer.pal(8, node.color))
       ) +
       geom_node_text(
         aes(
@@ -139,7 +139,7 @@ venn_net <- function(data,
       geom_node_point(aes(color = degree, size = size), alpha = 1.0) +
       scale_color_gradientn(
         colours =
-          rev(RColorBrewer::brewer.pal(8, nodes.color))
+          rev(RColorBrewer::brewer.pal(8, node.color))
       ) +
       geom_node_text(
         aes(
@@ -167,7 +167,7 @@ venn_net <- function(data,
       geom_node_point(aes(color = degree, size = size), alpha = 1.0) +
       scale_color_gradientn(
         colours =
-          rev(RColorBrewer::brewer.pal(8, nodes.color))
+          rev(RColorBrewer::brewer.pal(8, node.color))
       ) +
       geom_node_text(
         aes(

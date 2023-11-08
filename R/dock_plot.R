@@ -1,8 +1,8 @@
 #' Molecular docking scoring heatmap
 #'
 #' @param data Molecular docking results, data frame
-#' @param shape NULL or "circle"
-#' @param color color: see "RColorBrewer::display.brewer.all()"
+#' @param shape "square" or "circle" 
+#' @param color color: see "RColorBrewer::display.brewer.all()", brewer.pal(9,"Set1")
 #' @param text.size text size
 #' @param legend.mid legend median
 #' @param legend.width legend width
@@ -40,12 +40,12 @@
 #' colnames(data) <- paste("molecule", 1:9, sep = "")
 #' rownames(data) <- paste("target", 1:9, sep = "")
 #' data <- round(data, digits = 2)
-#' dock_plot(data)
-#' dock_plot(data, shape = "circle", legend.height = 3)
+#' dock_plot(data,text.size = 4)
+#' dock_plot(data, shape = "circle", text.size = 4,legend.height = 3)
 dock_plot <- function(data,
-                      shape = NULL,
+                      shape = 'square',
                       color = c("#4393C3", "#F7F7F7", "#D6604D"),
-                      text.size = 3,
+                      text.size = 4,
                       legend.mid = -2,
                       legend.width = 0.5,
                       legend.height = 5, ...) {
@@ -56,7 +56,7 @@ dock_plot <- function(data,
     return(x)
   }
   # Heat maps were generated in R using the ggplot2 package
-  if (is.null(shape)) {
+  if (shape=='square') {
     p1 <- data %>%
       as.data.frame() %>%
       dplyr::mutate(rowname = rownames(data), .before = 1) %>%
@@ -88,9 +88,11 @@ dock_plot <- function(data,
           angle = 45,
           vjust = 0.5,
           hjust = 0.5,
-          colour = "black"
+          colour = "black",
+          size = text.size*3
         ),
-        axis.text.y = element_text(colour = "black"),
+        axis.text.y = element_text(colour = "black",
+                                   size = text.size*3),
         plot.margin = unit(c(0, 0, 0, 0), "cm")
       ) +
       guides(fill = guide_colorbar(
@@ -148,9 +150,10 @@ dock_plot <- function(data,
           color = "black",
           angle = 45,
           vjust = 0.5,
-          hjust = 0.5
+          hjust = 0.5,
+          size = text.size*3
         ),
-        axis.text.y = element_text(color = "black"),
+        axis.text.y = element_text(color = "black",size = text.size*3),
         axis.ticks.x = element_blank(),
         axis.ticks.y = element_blank(),
         panel.border = element_rect(
@@ -179,3 +182,4 @@ dock_plot <- function(data,
     return(p4)
   }
 }
+

@@ -25,7 +25,6 @@
 #' @importFrom ggplot2 element_text
 #' @importFrom ggplot2 guide_colorbar
 #' @importFrom dplyr mutate
-#' @importFrom dplyr top_n
 #' @importFrom stats reorder
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom stringr str_wrap
@@ -46,15 +45,15 @@
 #'   pvalueCutoff = 0.05
 #' )
 #' KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID")
-#' CC<- enrichGO(
+#' BP <- enrichGO(
 #'   gene = eg$ENTREZID,
 #'   "org.Hs.eg.db",
-#'   ont = "CC",
+#'   ont = "BP",
 #'   pvalueCutoff = 0.05,
 #'   readable = TRUE
 #' )
 #' dot_plot(KK, title = "KEGG")
-#' dot_plot(CC, title = "cellular component", color = "Spectral")
+#' dot_plot(BP, title = "biological process")
 #' }
 dot_plot <- function(data,
                      color = "RdBu",
@@ -62,27 +61,17 @@ dot_plot <- function(data,
                      text.size = 10,
                      text.width = 35,
                      title = NULL, ...) {
-  # data processing
-  if (isS4(data)) {
-    data <- data@result %>% tidyr::drop_na()
-  } else if (is.data.frame(data)) {
-    data <- data %>% tidyr::drop_na()
-  } else {
-    print("The data format must be S4 object or data frame.")
-  }
   # Rich Factor
   data2 <- dplyr::mutate(data,
-    richFactor = Count / as.numeric(sub(
-      "/\\d+", "",
-      BgRatio
-    ))
-  ) %>%
-    dplyr::slice(1:top)
-  data2$richFactor <- data2$richFactor %>% round(digits = 2)
+                         richFactor = Count / as.numeric(sub(
+                           "/\\d+", "",
+                           BgRatio
+                         ))
+  )
   # ggplot2 plotting
-  p <- ggplot(
-    data2,
-    aes(richFactor, stats::reorder(Description, richFactor))
+  p <- ggplot(data2,
+              showCategory = top,
+              aes(richFactor, stats::reorder(Description, richFactor))
   ) +
     geom_point(aes(color = p.adjust, size = Count)) +
     scale_color_gradientn(
