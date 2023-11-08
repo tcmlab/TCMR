@@ -4,13 +4,7 @@
 \alias{herb_target}
 \title{Screen targets based on ingredients from Chinese herbal medicine}
 \usage{
-herb_target(
-  herb,
-  OB.value = 30,
-  DL.value = 0.18,
-  type = "Herb_name_pin_yin",
-  ...
-)
+herb_target(herb, OB.value = 30, DL.value = 0.18, type = "Herb_cn_name", ...)
 }
 \arguments{
 \item{herb}{The name of the compound Chinese herbal medicine}

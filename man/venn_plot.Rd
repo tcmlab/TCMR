@@ -52,7 +52,11 @@ figure
 Intersection of datasets
 }
 \examples{
+ \dontrun{
 library(UpSetR)
-data(venn.data, package = "TCMR")
-venn_plot(venn.data, type = 1)
+data(venn_data, package = "TCMR")
+venn_plot(venn_data, type =1)
+venn_plot(venn_data, type =2)
+}
+
 }

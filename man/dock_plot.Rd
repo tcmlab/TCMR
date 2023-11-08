@@ -6,9 +6,9 @@
 \usage{
 dock_plot(
   data,
-  shape = NULL,
+  shape = "square",
   color = c("#4393C3", "#F7F7F7", "#D6604D"),
-  text.size = 3,
+  text.size = 4,
   legend.mid = -2,
   legend.width = 0.5,
   legend.height = 5,
@@ -18,9 +18,9 @@ dock_plot(
 \arguments{
 \item{data}{Molecular docking results, data frame}
 
-\item{shape}{NULL or "circle"}
+\item{shape}{"square" or "circle"}
 
-\item{color}{color: see "RColorBrewer::display.brewer.all()"}
+\item{color}{color: see "RColorBrewer::display.brewer.all()", brewer.pal(9,"Set1")}
 
 \item{text.size}{text size}
 
@@ -44,6 +44,6 @@ data[1:9, seq(1, 9, 2)] <- data[1:9, seq(1, 9, 2)] - 4
 colnames(data) <- paste("molecule", 1:9, sep = "")
 rownames(data) <- paste("target", 1:9, sep = "")
 data <- round(data, digits = 2)
-dock_plot(data)
-dock_plot(data, shape = "circle", legend.height = 3)
+dock_plot(data,text.size = 4)
+dock_plot(data, shape = "circle", text.size = 4,legend.height = 3)
 }

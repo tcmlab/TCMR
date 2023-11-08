@@ -5,17 +5,13 @@
 \alias{compoundfinal}
 \title{compoundfinal}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 3397 rows and 6 columns.
-}
-\source{
-compound database
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 3397 rows and 5 columns.
 }
 \usage{
 compoundfinal
 }
 \description{
-Chinese medicine prescription(tcmp) and Chinese patent medicine(cpm)
-A data frame with 7321rows and 2 variables
+A data frame with 3397rows and 5 variables
 }
 \examples{
 head(compoundfinal)

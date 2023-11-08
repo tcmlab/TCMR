@@ -77,7 +77,7 @@ KK <- enrichKEGG(
   pvalueCutoff = 0.05
 )
 KK <- setReadable(KK, "org.Hs.eg.db", keyType = "ENTREZID") \%>\%
-  dplyr::mutate(richFactor = Count / as.numeric(sub("/\\\\d+", "", BgRatio)))
+  mutate(richFactor = Count / as.numeric(sub("/\\\\d+", "", BgRatio)))
 path <- separate_rows(KK@result, geneID, sep = "/")
 data_sankey <- left_join(xfbdf, path,
   by = c("target" = "geneID"),

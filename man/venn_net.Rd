@@ -6,7 +6,7 @@
 \usage{
 venn_net(
   data,
-  nodes.color = "Spectral",
+  node.color = "Spectral",
   node.size = c(1, 10),
   label.size = 3,
   label.degree = 1,
@@ -21,7 +21,7 @@ venn_net(
 \arguments{
 \item{data}{data frame}
 
-\item{nodes.color}{node color: see "RColorBrewer::display.brewer.all()"}
+\item{node.color}{node color: see "RColorBrewer::display.brewer.all()"}
 
 \item{node.size}{node size}
 
@@ -65,11 +65,11 @@ venn network
 }
 \examples{
 \dontrun{
-data(venn.data, package = "TCMR")
+data(venn_data, package = "TCMR")
 set.seed(1234)
-gene <- names(sort(table(venn.data$gene), decreasing = TRUE))[1:50]
-data <- venn.data[venn.data$gene \%in\% gene, ]
-data2 <- dplyr::sample_n(venn.data, 100) \%>\%
+gene <- names(sort(table(venn_data$gene), decreasing = TRUE))[1:50]
+data <- venn_data[venn.data$gene \%in\% gene, ]
+data2 <- dplyr::sample_n(venn_data, 100) \%>\%
   rbind(data)
 venn_net(data2, label.degree = 1,graph.layout = "fr")
 venn_net(data2, edge.type = "hive", label.degree = 4)

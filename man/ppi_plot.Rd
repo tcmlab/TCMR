@@ -6,7 +6,7 @@
 \usage{
 ppi_plot(
   data,
-  nodes.color = "RdBu",
+  node.color = "RdBu",
   node.size = c(1, 10),
   label.size = 4,
   label.degree = 5,
@@ -21,7 +21,7 @@ ppi_plot(
 \item{data}{Human protein-protein interaction (PPI)
 data were downloaded from the STRING database.}
 
-\item{nodes.color}{node color: see "RColorBrewer::display.brewer.all()"}
+\item{node.color}{node color: see "RColorBrewer::display.brewer.all()"}
 
 \item{node.size}{node size}
 
@@ -54,12 +54,7 @@ Protein-protein interaction analysis
 }
 \examples{
 \dontrun{
-data(string, package = "TCMR")
-ppi_plot(string, label.repel = FALSE)
-ppi_plot(string,
-  label.degree = 1,
-  nodes.color = "Spectral",
-  label.repel = TRUE
-)
+data(ppi_data, package = "TCMR")
+ppi_plot(ppi_data, label.repel = FALSE)
 }
 }
