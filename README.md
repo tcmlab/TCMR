@@ -134,66 +134,33 @@ ai di cha   MOL000098       quercetin    IL6
 
 ```{r}
 #通过疾病靶点基因寻找中药及其处方
-data(disease_gene, package = "TCMR")
-newdata <- tcm_prescription(disease_gene)
-```
-
-
-```{r}
 #寻找到的中药
-library(formattable)
-formattable(newdata[[1]])
+tcm_prescription(disease_data)[[1]]
+# A tibble: 273 × 2
+# Groups:   Herb_cn_name [273]
+   Herb_cn_name  freq
+   <chr>        <int>
+ 1 人参           437
+ 2 甘草           433
+ 3 胡芦巴         325
+ 4 皂角刺         288
+ 5 地榆           276
+# ℹ 263 more rows
+# ℹ Use `print(n = ...)` to see more rows
 ```
-<img src= https://github.com/tcmlab/image/blob/main/%E8%8D%AF%E7%89%A9%E7%AD%9B%E9%80%89.png height="400" />
 
 ```{r}
 #寻找到的处方
-formattable(newdata[[2]], list(
-  Count = color_bar("lightblue")
-  ))
+library(formattable)
+formattable(tcm_prescription(disease_data)[[2]], list(Count = color_bar("lightblue")))
 ```
-<img src= https://github.com/tcmlab/image/blob/main/%E5%A4%84%E6%96%B9%E8%A1%A8%E6%A0%BC.png height="400" />
+<img src= https://github.com/tcmlab/image/blob/main/tcm_pre2.png height="400" />
 
 ```{r}
 # draw plot
-data2 <- newdata[[2]] %>%
-  arrange(desc(Count)) %>%
-  slice(1:20)
-
-pacman::p_load(showtext)
-showtext_auto()
-
-data2$CompoundId <- factor(data2$CompoundId, levels = rev(data2$CompoundId))
-font.size <- 8
-ggplot(data2, aes(x = CompoundId, y = Count, fill = Pvalue)) +
-  geom_bar(stat = "identity") +
-  coord_flip() +
-  theme(text = element_text(family = "Kai")) +
-  scale_fill_gradientn(
-    colours = RColorBrewer::brewer.pal(8, "RdBu"),
-    trans = "log10",
-    guide = guide_colorbar(reverse = TRUE, order = 1)
-  ) +
-  labs(x = NULL) +
-  theme_bw() +
-  ggtitle("") +
-  theme(
-    axis.text.x = element_text(
-      colour = "black",
-      size = font.size, vjust = 1
-    ),
-    axis.text.y = element_text(
-      colour = "black",
-      size = font.size, hjust = 1
-    ),
-    axis.title = element_text(
-      margin = margin(10, 5, 0, 0),
-      color = "black", size = font.size
-    ),
-    axis.title.y = element_text(angle = 90)
-  )
+tcm_pre_plot(tcm_prescription(disease_data)[[2]],color = 'Spectral')
 ```
-<img src= https://github.com/tcmlab/image/blob/main/%E7%AD%9B%E9%80%89%E5%90%8E%E7%9A%84%E5%A4%84%E6%96%B9.png height="400" />
+<img src= https://github.com/tcmlab/image/blob/main/tcm_pre_plot.png height="400" />
 
 ## 5. tcm_net
 
