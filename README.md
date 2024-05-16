@@ -8,7 +8,8 @@ time: 2023-9-07
 ## Introduction
 
 Hello, here is the TCMR package for TCM research.
-
+TCMR的维护和更新将要转到新的包:TCMNP.请移到
+https://github.com/tcmlab/TCMNP
 ## Installation
 
 You can install the development version of TCMR like so:
